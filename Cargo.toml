@@ -7,12 +7,13 @@
 [workspace]
 members = [ "crates/*", "bindings/ffi" ]
 # for running `cargo test`, `cargo doc` etc at the workspace root
+# wasm is built via wasm-pack for the wasm32 target, not by a native
+# `cargo build`; keep it out of default-members so root builds/tests are native.
 default-members = [
   "crates/csl",
   "crates/io",
   "crates/db",
   "crates/proc",
-  "crates/wasm",
   "crates/citeproc",
   "bindings/ffi",
 ]

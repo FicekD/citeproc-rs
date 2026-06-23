@@ -4,9 +4,6 @@
 //
 // Copyright © 2019 Corporation for Digital Scholarship
 
-#![feature(custom_test_frameworks)]
-#![test_runner(datatest::runner)]
-
 use cfg_if::cfg_if;
 cfg_if! {
     if #[cfg(all(feature="test-allocator-jemalloc", feature="jemallocator"))] {
@@ -96,12 +93,12 @@ fn setup() {
     });
 }
 
-#[datatest::files("tests/data/test-suite/processor-tests/humans", {
-    path in r"^(.*)\.txt" if !is_ignore,
-})]
-fn csl_test_suite(path: &Path) {
+fn csl_test_suite(path: &Path) -> datatest_stable::Result<()> {
     setup();
-    let input = read_to_string(path).unwrap();
+    if is_ignore(path) {
+        return Ok(());
+    }
+    let input = read_to_string(path)?;
     let mut test_case = parse_human_test(&input, None);
     if let Some(res) = test_case.execute() {
         let pass = res == test_case.result;
@@ -112,26 +109,25 @@ fn csl_test_suite(path: &Path) {
             assert_eq!(PrettyString(&res), PrettyString(&test_case.result));
         }
     }
+    Ok(())
 }
 
-#[datatest::files("tests/data/humans", {
-    path in r"^(.*)\.yml",
-})]
-fn humans(path: &Path) {
+fn humans(path: &Path) -> datatest_stable::Result<()> {
     setup();
-    let input = read_to_string(path).unwrap();
+    let input = read_to_string(path)?;
     let mut test_case = parse_yaml_test(&input).unwrap();
     if let Some(res) = test_case.execute() {
         assert_eq!(PrettyString(&res), PrettyString(&test_case.result));
     }
+    Ok(())
 }
 
-#[datatest::files("tests/data/fixtures-local", {
-    path in r"^(.*)\.txt" if !is_ignore,
-})]
-fn fixtures_local(path: &Path) {
+fn fixtures_local(path: &Path) -> datatest_stable::Result<()> {
     setup();
-    let input = read_to_string(path).unwrap();
+    if is_ignore(path) {
+        return Ok(());
+    }
+    let input = read_to_string(path)?;
     let mut test_case = parse_human_test(
         &input,
         Some(csl::Features {
@@ -148,4 +144,11 @@ fn fixtures_local(path: &Path) {
             assert_eq!(PrettyString(&res), PrettyString(&test_case.result));
         }
     }
+    Ok(())
+}
+
+datatest_stable::harness! {
+    { test = csl_test_suite, root = "tests/data/test-suite/processor-tests/humans", pattern = r".*\.txt$" },
+    { test = humans, root = "tests/data/humans", pattern = r".*\.yml$" },
+    { test = fixtures_local, root = "tests/data/fixtures-local", pattern = r".*\.txt$" },
 }

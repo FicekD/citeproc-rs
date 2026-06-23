@@ -222,10 +222,10 @@ impl fmt::Display for HtmlAttrEscaper<'_> {
     }
 }
 
-fn escape_html_attribute(attr_inner: &str) -> HtmlAttrEscaper {
+fn escape_html_attribute(attr_inner: &str) -> HtmlAttrEscaper<'_> {
     HtmlAttrEscaper { attr_inner }
 }
 
-fn escape_html(text: &str) -> HtmlEscaper {
+fn escape_html(text: &str) -> HtmlEscaper<'_> {
     HtmlEscaper { text }
 }

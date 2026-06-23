@@ -168,7 +168,7 @@ fn year(inp: &str) -> IResult<&str, i32> {
     ))
 }
 
-fn date(inp: &str) -> IResult<&str, CmpDate> {
+fn date(inp: &str) -> IResult<&str, CmpDate<'_>> {
     let (rem1, year) = opt(year)(inp)?;
     fn still_date(c: char) -> bool {
         c != DATE_END && c != '/'
@@ -177,10 +177,10 @@ fn date(inp: &str) -> IResult<&str, CmpDate> {
     Ok((rem2, CmpDate { year, rest }))
 }
 
-fn range(inp: &str) -> IResult<&str, Token> {
+fn range(inp: &str) -> IResult<&str, Token<'_>> {
     let (rem1, _) = char(DATE_START)(inp)?;
     let (rem2, first) = date(rem1)?;
-    fn and_ymd(inp: &str) -> IResult<&str, CmpDate> {
+    fn and_ymd(inp: &str) -> IResult<&str, CmpDate<'_>> {
         let (rem1, _) = char('/')(inp)?;
         Ok(date(rem1)?)
     }
@@ -195,7 +195,7 @@ fn range(inp: &str) -> IResult<&str, Token> {
     ))
 }
 
-fn citation_number(inp: &str) -> IResult<&str, Token> {
+fn citation_number(inp: &str) -> IResult<&str, Token<'_>> {
     delimited(
         char(CITATION_NUM_START),
         map(take_8_digits, |x| Token::CitationNumber(to_u32(x))),
@@ -203,7 +203,7 @@ fn citation_number(inp: &str) -> IResult<&str, Token> {
     )(inp)
 }
 
-fn num(inp: &str) -> IResult<&str, Token> {
+fn num(inp: &str) -> IResult<&str, Token<'_>> {
     delimited(
         char(NUM_START),
         map(take_8_digits, |x| Token::Num(to_u32(x))),
@@ -211,14 +211,14 @@ fn num(inp: &str) -> IResult<&str, Token> {
     )(inp)
 }
 
-fn str_token(inp: &str) -> IResult<&str, Token> {
+fn str_token(inp: &str) -> IResult<&str, Token<'_>> {
     fn normal(c: char) -> bool {
         !(c == DATE_START || c == NUM_START || c == CITATION_NUM_START)
     }
     map(take_while1(normal), Token::Str)(inp)
 }
 
-fn token(inp: &str) -> IResult<&str, Token> {
+fn token(inp: &str) -> IResult<&str, Token<'_>> {
     alt((str_token, citation_number, num, range))(inp)
 }
 

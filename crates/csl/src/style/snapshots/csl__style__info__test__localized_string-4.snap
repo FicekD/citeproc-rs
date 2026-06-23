@@ -14,5 +14,5 @@ LSHelper {
             ),
         ),
     },
-    _marker: PhantomData,
+    _marker: PhantomData<csl::style::info::TitleHint>,
 }

@@ -7,5 +7,5 @@ LSHelper {
         value: "content",
         lang: None,
     },
-    _marker: PhantomData,
+    _marker: PhantomData<csl::style::info::TitleHint>,
 }

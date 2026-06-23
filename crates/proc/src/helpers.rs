@@ -376,7 +376,7 @@ pub(crate) mod slice_group_by {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// #![feature(slice_group_by)]
     ///
     /// let slice = &[1, 1, 1, 3, 3, 2, 2, 2];
@@ -391,7 +391,7 @@ pub(crate) mod slice_group_by {
     ///
     /// This method can be used to extract the sorted subslices:
     ///
-    /// ```
+    /// ```ignore
     /// #![feature(slice_group_by)]
     ///
     /// let slice = &[1, 1, 2, 3, 2, 3, 2, 3, 4];
@@ -421,7 +421,7 @@ pub(crate) mod slice_group_by {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// #![feature(slice_group_by)]
     ///
     /// let slice = &mut [1, 1, 1, 3, 3, 2, 2, 2];
@@ -436,7 +436,7 @@ pub(crate) mod slice_group_by {
     ///
     /// This method can be used to extract the sorted subslices:
     ///
-    /// ```
+    /// ```ignore
     /// #![feature(slice_group_by)]
     ///
     /// let slice = &mut [1, 1, 2, 3, 2, 3, 2, 3, 4];

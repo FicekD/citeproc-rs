@@ -13,7 +13,7 @@ fn is_word(s: &str) -> bool {
     s.chars().any(|ch| ch.is_alphanumeric())
 }
 
-fn transform_first_char_of_word<F, I>(word: &str, f: F) -> SmartCow
+fn transform_first_char_of_word<F, I>(word: &str, f: F) -> SmartCow<'_>
 where
     F: Fn(char) -> I,
     I: Iterator<Item = char> + Clone,
@@ -37,7 +37,7 @@ where
     }
 }
 
-fn transform_uppercase_first(word: &str) -> SmartCow {
+fn transform_uppercase_first(word: &str) -> SmartCow<'_> {
     transform_first_char_of_word(word, |c| c.to_uppercase())
 }
 

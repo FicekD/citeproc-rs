@@ -10,7 +10,7 @@ pub(crate) fn lazy_lowercase_owned(s: String) -> String {
     lazy_char_transform_owned(s, |c| c.to_lowercase())
 }
 
-pub(crate) fn lazy_lowercase(s: &str) -> SmartCow {
+pub(crate) fn lazy_lowercase(s: &str) -> SmartCow<'_> {
     lazy_char_transform(s, |c| c.to_lowercase())
 }
 
@@ -29,7 +29,7 @@ pub fn lazy_char_transform_owned<I: Iterator<Item = char>>(
     }
 }
 
-pub fn lazy_char_transform<I: Iterator<Item = char>>(s: &str, f: impl Fn(char) -> I) -> SmartCow {
+pub fn lazy_char_transform<I: Iterator<Item = char>>(s: &str, f: impl Fn(char) -> I) -> SmartCow<'_> {
     transform(s, |rest| {
         let next = next_char(rest).expect("only called when there is remaining input");
         let mut lower_iter = f(next).peekable();
@@ -99,7 +99,7 @@ enum TransformedPart {
 fn transform(
     slice: &str,
     mut transform_next: impl FnMut(&mut &str) -> TransformedPart,
-) -> SmartCow {
+) -> SmartCow<'_> {
     let mut rest = slice;
     let mut copied = loop {
         if rest.is_empty() {

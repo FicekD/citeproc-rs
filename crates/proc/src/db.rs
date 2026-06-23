@@ -344,7 +344,7 @@ impl IrGen {
     pub(crate) fn tree(&self) -> &IrTree {
         &self.tree
     }
-    pub(crate) fn tree_ref(&self) -> IrTreeRef {
+    pub(crate) fn tree_ref(&self) -> IrTreeRef<'_> {
         self.tree.tree_ref()
     }
     pub(crate) fn tree_mut(&mut self) -> &mut IrTree {
@@ -789,7 +789,7 @@ fn expand_one_name_ir(
     use crate::disamb::names::MatchKey;
 
     let name_ambiguity_number =
-        |edge: &EdgeData, match_key: Option<&MatchKey>, slot: &[NameVariantMatcher]| -> u32 {
+        |edge: &EdgeData, _match_key: Option<&MatchKey>, slot: &[NameVariantMatcher]| -> u32 {
             slot.iter()
                 .filter(|matcher| matcher.accepts(edge, None))
                 .count() as u32

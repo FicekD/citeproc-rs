@@ -1,18 +1,61 @@
 # `citeproc-rs`
 
-A work-in-progress implementation of [CSL][] and [CSL-M][] in [Rust][]. It is 
-geared at:
+A work-in-progress implementation fork of [CSL][] and [CSL-M][] in [Rust][]. It is geared at:
 
-* replacing `citeproc-js` by providing WebAssembly bindings such that it could 
-  be embedded in Zotero or fulfil any other JavaScript-based use;
+* replacing `citeproc-js` by providing WebAssembly bindings such that it could be embedded in Zotero or fulfil any other JavaScript-based use;
 * replacing much of `pandoc-citeproc`, by running as a Pandoc Filter;
-* making it easy to use citeproc from any programming language, and integrate 
-  into any use case; and
+* making it easy to use citeproc from any programming language, and integrate into any use case; and
 * correctness and high performance.
 
 [CSL]: https://docs.citationstyles.org/en/stable/specification.html
 [CSL-M]: https://citeproc-js.readthedocs.io/en/latest/csl-m/index.html
 [Rust]: https://rust-lang.org/
+
+It supersedes the upstream sections above where they conflict (in particular, this fork no longer requires a nightly compiler).
+
+This is a fork of [`cormacrelf/citeproc-rs`][upstream] ported to build and test on a **modern, stable Rust toolchain** (developed against Rust 1.95). The original required a nightly compiler and several abandoned/unsound dependencies; none of that is needed anymore.
+
+[upstream]: https://github.com/cormacrelf/citeproc-rs
+
+## Status
+
+The native workspace (the `csl`, `io`, `db`, `proc`, `citeproc` library crates and the `bindings/ffi` crate) **builds and tests cleanly on stable Rust with zero warnings**. The full CSL test suite runs via `cargo test`.
+
+Not ported (excluded from the default build):
+
+* **`crates/wasm`** — still pins a patched `wasm-bindgen` fork and other pre-modern wasm dependencies. It is removed from `default-members` and is not built by a plain `cargo build`. Porting it is a separate effort. * **`crates/cli`** — abandoned upstream since 2020; it references an API and dependencies that no longer exist. Left as-is, excluded from the default build.
+
+## Building and testing (stable Rust)
+
+```sh
+# one-time setup for the test suite
+git submodule update --init           # pulls the CSL test-suite fixtures
+cargo pull-locales                    # clones the CSL locales into the OS cache dir
+
+# build the native library + FFI crates
+cargo build
+
+# run everything: unit tests + the full CSL test suite (now on stable)
+cargo test
+```
+
+The CSL test suite is wired through [`datatest-stable`] (replacing the upstream nightly-only `datatest` harness), so `#![feature(custom_test_frameworks)]` is gone. Known-failing cases are tracked in `crates/citeproc/tests/data/ignore.txt`.
+
+[`datatest-stable`]: https://crates.io/crates/datatest-stable
+
+## What changed in the port
+
+* Migrated the test harness from the nightly `datatest` fork to stable `datatest-stable`.
+* Replaced unsound/abandoned dependencies: `smartstring` 0.2 → 1.0 (the 0.2 line is UB on modern rustc), bumped `tendril`, `nom` 6 → 7, and the `html5ever`/`markup5ever_rcdom` stack.
+* Made locale parsing forward-compatible: unknown CSL locale term names are now skipped with a warning instead of failing the whole locale.
+* Gated `jemalloc` to non-MSVC targets; made `dlmalloc` an opt-in test feature.
+* Cleaned up all compiler warnings.
+
+---
+
+# Forked from
+
+**Everything below this line is from the original forked repository.*
 
 ## Supported Rust versions
 
@@ -234,4 +277,3 @@ open out.html
 ```
 
 -->
-

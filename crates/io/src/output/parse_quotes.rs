@@ -345,6 +345,7 @@ fn test_stamp() {
 #[derive(Debug)]
 struct QuoteMatcher<'a> {
     original: &'a Vec<MicroNode>,
+    #[allow(dead_code)]
     options: &'a IngestOptions,
 }
 

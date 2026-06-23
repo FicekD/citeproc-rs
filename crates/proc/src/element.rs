@@ -282,6 +282,7 @@ impl YearSuffixHook {
     }
 }
 
+#[allow(dead_code)]
 struct ProcWalker<'a, O, I>
 where
     O: OutputFormat,

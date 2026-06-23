@@ -148,7 +148,6 @@ fn split_drop_given(given: &mut String) -> Option<String> {
             let all = found.as_str().trim_start();
             particles = replace_apostrophes(all);
             let start = found.start();
-            drop(found);
             given.truncate(start);
         }
     }
@@ -167,7 +166,6 @@ fn split_suffix(given: &mut String) -> Option<(String, bool)> {
         let (spaced_suffix, force_comma) = after_excl.unwrap_or((s, false));
         let suffix: String = spaced_suffix.trim().into();
         let start = found.start();
-        drop(found);
         given.truncate(start);
         given.trim_end_in_place();
         return Some((suffix, force_comma));

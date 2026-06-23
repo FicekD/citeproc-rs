@@ -214,6 +214,7 @@ struct GenericDateBits<'a> {
     overall_text_case: TextCase,
     display: Option<DisplayMode>,
     sorting: bool,
+    #[allow(dead_code)]
     locale: &'a Locale,
 }
 

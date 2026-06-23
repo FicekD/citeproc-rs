@@ -7,7 +7,7 @@ macro_rules! ffi_fn {
     ($(#[$doc:meta])* fn $name:ident($($arg:ident: $arg_ty:ty),*) -> $ret:ty $body:block) => {
         $(#[$doc])*
         #[no_mangle]
-        pub extern fn $name($($arg: $arg_ty),*) -> $ret {
+        pub extern "C" fn $name($($arg: $arg_ty),*) -> $ret {
             use std::panic::{self, AssertUnwindSafe};
 
             // The blanket AssertUnwindSafe is only possible because if we ever do panic we abort,
@@ -35,7 +35,7 @@ macro_rules! ffi_fn_nullify {
     ($(#[$doc:meta])* $(@safety $unsafe:tt)? fn $name:ident($( $(#[$wrapper:ident])? $arg:ident: $arg_ty:ty),*) -> $ret:ty $body:block) => {
         $(#[$doc])*
         #[no_mangle]
-        pub $($unsafe)? extern fn $name($( $arg: $arg_ty),*) -> $ret {
+        pub $($unsafe)? extern "C" fn $name($( $arg: $arg_ty),*) -> $ret {
             use std::panic;
             use $crate::macros::MakeUnwindSafe;
             $(

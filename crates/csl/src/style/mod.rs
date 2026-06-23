@@ -418,16 +418,16 @@ impl From<ConditionParser> for CondSet {
         for x in cp.variable { conds.insert(Cond::Variable(x)); }
         for x in cp.is_numeric { conds.insert(Cond::IsNumeric(x)); }
         for x in cp.is_plural { conds.insert(Cond::IsPlural(x)); }
-        for x in cp.context { conds.insert(Cond::Context(x)); }
-        for x in cp.disambiguate { conds.insert(Cond::Disambiguate(x)); }
+        if let Some(x) = cp.context { conds.insert(Cond::Context(x)); }
+        if let Some(x) = cp.disambiguate { conds.insert(Cond::Disambiguate(x)); }
         for x in cp.is_uncertain_date { conds.insert(Cond::IsUncertainDate(x)); }
 
         // CSL-M
         for x in cp.has_year_only { conds.insert(Cond::HasYearOnly(x)); }
         for x in cp.has_month_or_season { conds.insert(Cond::HasMonthOrSeason(x)); }
         for x in cp.has_day { conds.insert(Cond::HasDay(x)); }
-        for x in cp.jurisdiction { conds.insert(Cond::Jurisdiction(x)); }
-        for x in cp.subjurisdictions { conds.insert(Cond::SubJurisdiction(x)); }
+        if let Some(x) = cp.jurisdiction { conds.insert(Cond::Jurisdiction(x)); }
+        if let Some(x) = cp.subjurisdictions { conds.insert(Cond::SubJurisdiction(x)); }
 
         CondSet {
             match_type: cp.match_type,

@@ -66,7 +66,7 @@ pub(crate) mod prelude {
     pub use crate::ir::IrSum;
     pub type IrArena<O = Markup> = indextree::Arena<IrSum<O>>;
     pub use crate::cite_context::RenderContext;
-    pub use crate::db::{safe_default, ImplementationDetails, IrDatabase};
+    pub use crate::db::{ImplementationDetails, IrDatabase};
     pub use crate::renderer::GenericContext;
     pub(crate) use crate::tree::{IrTree, IrTreeMut, IrTreeRef};
     pub use crate::walker::{StyleWalker, WalkerFoldType};
@@ -75,8 +75,8 @@ pub(crate) mod prelude {
     pub use citeproc_io::output::markup::Markup;
     pub use citeproc_io::output::OutputFormat;
     pub use citeproc_io::IngestOptions;
-    pub use citeproc_io::{NumberLike, NumericValue};
-    pub use citeproc_io::{SmartCow, SmartString};
+    
+    pub use citeproc_io::SmartString;
     pub use csl::CiteOrBib;
     pub use indextree::{Node, NodeId};
 
@@ -86,7 +86,7 @@ pub(crate) mod prelude {
     pub use crate::group::GroupVars;
     pub use crate::ir::*;
     pub use crate::ref_ir::*;
-    pub use crate::sort::BibNumber;
+    
 
     pub(crate) type MarkupBuild = <Markup as OutputFormat>::Build;
     pub(crate) type MarkupOutput = <Markup as OutputFormat>::Output;

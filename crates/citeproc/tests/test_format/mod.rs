@@ -5,7 +5,6 @@
 // Copyright © 2019 Corporation for Digital Scholarship
 
 pub use citeproc;
-pub use citeproc_proc;
 
 use citeproc::prelude::string_id::Cluster as ClusterStr;
 use citeproc::prelude::*;

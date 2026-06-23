@@ -217,7 +217,7 @@ impl fmt::Display for RtfEscaper<'_> {
     }
 }
 
-fn rtf_escape(s: &str) -> RtfEscaper {
+fn rtf_escape(s: &str) -> RtfEscaper<'_> {
     RtfEscaper(s)
 }
 
@@ -251,7 +251,7 @@ impl fmt::Display for RtfUrlEscaper<'_> {
     }
 }
 
-fn rtf_escape_url_in_attr(s: &str) -> RtfUrlEscaper {
+fn rtf_escape_url_in_attr(s: &str) -> RtfUrlEscaper<'_> {
     RtfUrlEscaper(s)
 }
 

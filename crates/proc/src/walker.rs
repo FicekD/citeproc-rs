@@ -7,6 +7,7 @@
 use crate::choose::CondChecker;
 use csl::*;
 
+#[allow(dead_code)]
 pub enum WalkerFoldType<'a> {
     Group(&'a Group),
     Layout(&'a Layout),
@@ -117,6 +118,7 @@ pub trait StyleWalker {
             .as_ref()
             .map(|bib| self.layout(&bib.layout))
     }
+    #[allow(dead_code)]
     fn bibliography(&mut self, bib: &Bibliography) -> Self::Output {
         self.layout(&bib.layout)
     }

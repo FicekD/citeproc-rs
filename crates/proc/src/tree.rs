@@ -20,13 +20,13 @@ impl<O: OutputFormat> IrTree<O> {
     pub(crate) fn extend(&mut self, src: IrTreeRef<O>) -> Option<NodeId> {
         arena_copy_tree(src.node, src.arena, &mut self.arena)
     }
-    pub(crate) fn tree_ref(&self) -> IrTreeRef<O> {
+    pub(crate) fn tree_ref(&self) -> IrTreeRef<'_, O> {
         IrTreeRef {
             node: self.root,
             arena: &self.arena,
         }
     }
-    pub(crate) fn tree_at_node(&self, node: NodeId) -> IrTreeRef<O> {
+    pub(crate) fn tree_at_node(&self, node: NodeId) -> IrTreeRef<'_, O> {
         IrTreeRef {
             node,
             arena: &self.arena,
@@ -48,7 +48,7 @@ impl<'a, O: OutputFormat> IrTreeRef<'a, O> {
     pub(crate) fn new(node: NodeId, arena: &'a IrArena<O>) -> Self {
         Self { node, arena }
     }
-    pub(crate) fn with_node(&self, node: NodeId) -> IrTreeRef<O> {
+    pub(crate) fn with_node(&self, node: NodeId) -> IrTreeRef<'_, O> {
         IrTreeRef {
             node,
             arena: &self.arena,
@@ -239,7 +239,7 @@ impl<'a, O: OutputFormat> IrTreeRef<'a, O> {
 
 #[allow(dead_code)]
 impl<O: OutputFormat> IrTree<O> {
-    pub(crate) fn mutable(&mut self) -> IrTreeMut<O> {
+    pub(crate) fn mutable(&mut self) -> IrTreeMut<'_, O> {
         IrTreeMut {
             node: self.root,
             arena: &mut self.arena,
@@ -252,13 +252,13 @@ impl<O: OutputFormat> IrTree<O> {
 
 #[allow(dead_code)]
 impl<'a, O: OutputFormat> IrTreeMut<'a, O> {
-    pub(crate) fn tree_at_node(&self, node: NodeId) -> IrTreeRef<O> {
+    pub(crate) fn tree_at_node(&self, node: NodeId) -> IrTreeRef<'_, O> {
         IrTreeRef {
             node,
             arena: self.arena,
         }
     }
-    pub(crate) fn as_ref(&self) -> IrTreeRef<O> {
+    pub(crate) fn as_ref(&self) -> IrTreeRef<'_, O> {
         IrTreeRef {
             node: self.node,
             arena: self.arena,

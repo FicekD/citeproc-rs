@@ -168,6 +168,7 @@ impl<'de> Deserialize<'de> for WrapType {
 }
 
 #[derive(Debug)]
+#[allow(dead_code)]
 struct WrapVar(AnyVariable);
 
 impl<'de> Deserialize<'de> for WrapVar {

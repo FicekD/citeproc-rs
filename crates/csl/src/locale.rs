@@ -161,6 +161,15 @@ impl FromNode for Locale {
         let terms_node = node.children().filter(|el| el.has_tag_name("terms")).nth(0);
         if let Some(tn) = terms_node {
             for n in tn.children().filter(|el| el.has_tag_name("term")) {
+                // Forward-compat: newer CSL locale data may define term names this
+                // version doesn't model yet. Skip those rather than failing the
+                // entire locale parse; genuine errors on known terms still propagate.
+                if let Some(name) = n.attribute("name") {
+                    if AnyTermName::get_attr(name, &info.features).is_err() {
+                        log::warn!("skipping unknown locale term name: {:?}", name);
+                        continue;
+                    }
+                }
                 match TermEl::from_node(&n, info)? {
                     TermEl::Simple(sel, con) => {
                         simple_terms.insert(sel, con);

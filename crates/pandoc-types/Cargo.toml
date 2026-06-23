@@ -1,6 +1,7 @@
 [package]
 name = "pandoc_types"
 version = "0.3.0"
+edition = "2018"
 authors = [
   "Elliott Slaughter <elliottslaughter@gmail.com>",
   "Cormac Relf <web@cormacrelf.net>"

@@ -190,7 +190,7 @@ use nom::{
     branch::alt,
     bytes::complete::{escaped, is_not, tag},
     character::complete::{char, digit1, one_of},
-    combinator::{map, map_parser, opt},
+    combinator::{map, map_parser, map_res, opt, rest},
     multi::{fold_many1, many0, many0_count},
     sequence::{delimited, tuple},
     IResult,
@@ -228,7 +228,7 @@ fn sep<'a>(and_term: &'a str) -> impl Fn(&'a str) -> IResult<&'a str, NumericTok
 
 /// Parses and counts leading zeros
 fn from_digits(input: &str) -> IResult<&str, u32> {
-    nom::parse_to!(input, u32)
+    map_res(rest, |s: &str| s.parse::<u32>())(input)
 }
 
 fn int(inp: &str) -> IResult<&str, NumericToken> {
@@ -318,7 +318,7 @@ fn num_alpha_num(inp: &str) -> IResult<&str, NumericToken> {
     // Split it into a sequence of numeric / non-numerics, and save the last numeric one
     let (rem, res) = fold_many1(
         alt((map(num_pre, Blk::alpha), map_parser(digit1, Blk::num))),
-        Acc::Len(0),
+        || Acc::Len(0),
         |acc, neu| match neu {
             Blk::Num(new_num_len, new_num) => match acc {
                 Acc::Len(prefix) => Acc::LenNum {
@@ -399,7 +399,7 @@ fn roman_numeral(inp: &str) -> IResult<&str, NumericToken> {
     }
     Err(nom::Err::Error(nom::error::Error::new(
         inp,
-        nom::error::ErrorKind::ParseTo,
+        nom::error::ErrorKind::Verify,
     )))
 }
 

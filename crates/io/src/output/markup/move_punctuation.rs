@@ -24,7 +24,7 @@ fn smash_string_push(base: &mut String, suff: &str) {
     let b_spaces = base.len() - btrim.len();
     let mut trimmed_len = btrim.len();
     let strim = suff.trim_start_matches(smash_trim);
-    let s_spaces = suff.len() - strim.len();
+    let _s_spaces = suff.len() - strim.len();
     let b_ends_punc = btrim.chars().rev().nth(0).map_or(false, is_punc);
     let s_starts_punc = strim.chars().nth(0).map_or(false, is_punc);
     if !b_ends_punc || !s_starts_punc {
@@ -139,7 +139,6 @@ impl InlineElement {
             let len = m.len();
             if len == 1 {
                 if let Some(text) = m.first_mut().unwrap().take_text() {
-                    drop(m);
                     *self = InlineElement::Text(text);
                     return Some(Vec::new());
                 }
@@ -170,14 +169,12 @@ pub fn normalise_text_elements(slice: &mut Vec<InlineElement>) {
         let mut pop_tail = false;
         if let Some(head) = slice.get_mut(ix) {
             if let Some(before_head) = head.normalise_micro_single_text() {
-                drop(head);
                 drop(slice.splice(ix..ix, before_head.into_iter()));
                 continue;
             }
         }
         if let Some(tail_head) = slice.get_mut(ix + 1) {
             if let Some(before) = tail_head.normalise_micro_single_text() {
-                drop(tail_head);
                 drop(slice.splice(ix + 1..ix + 1, before.into_iter()));
                 continue;
             }
@@ -268,6 +265,7 @@ pub fn normalise_text_elements_micro(slice: &mut Vec<MicroNode>) {
     }
 }
 
+#[allow(dead_code)]
 enum Motion {
     RemovedAndRetry(usize),
     RemovedNoChanges(usize),
@@ -346,7 +344,6 @@ fn move_around_quote(els: &mut Vec<InlineElement>, ix: usize, piq: bool) -> Opti
             } else {
                 // the string is empty! let's fix it just because;
                 warn!("found empty string in move_punctuation");
-                drop(suffix);
                 return None;
             }
         };
@@ -492,6 +489,7 @@ pub fn is_punc(c: char) -> bool {
     c == '.' || c == ',' || c == '!' || c == '?' || c == ';' || c == ':'
 }
 
+#[allow(dead_code)]
 fn is_punc_space(c: char) -> bool {
     is_punc(c) || c.is_whitespace()
 }
@@ -625,7 +623,8 @@ fn find_right_quote_inside<'a>(
             if !inlines.is_empty() {
                 let len = inlines.len();
                 let next = unsafe { &mut *(next as *mut String) };
-                let last_mut = unsafe { &mut (*((inlines) as *mut Vec<InlineElement>))[len - 1] };
+                let inlines_mut = unsafe { &mut *(inlines as *mut Vec<InlineElement>) };
+                let last_mut = &mut inlines_mut[len - 1];
                 let deeper = find_right_quote_inside(last_mut, next);
                 if deeper.is_some() {
                     return deeper;
@@ -662,7 +661,8 @@ fn find_right_quote_inside_micro<'b>(
             if !children.is_empty() {
                 let len = children.len();
                 let next = unsafe { &mut *(next as *mut String) };
-                let last_mut = unsafe { &mut (*((children) as *mut Vec<MicroNode>))[len - 1] };
+                let children_mut = unsafe { &mut *(children as *mut Vec<MicroNode>) };
+                let last_mut = &mut children_mut[len - 1];
                 let deeper = find_right_quote_inside_micro(last_mut, next);
                 if deeper.is_some() {
                     return deeper;
@@ -682,6 +682,7 @@ fn find_right_quote_inside_micro<'b>(
 
 /// "Insertion" == push to one of these vectors.
 #[derive(Debug)]
+#[allow(dead_code)]
 enum RightQuoteInsertionPoint<'a> {
     InsideInline(&'a mut Vec<InlineElement>, &'a mut String),
     InsideMicro(&'a mut Vec<MicroNode>, &'a mut String),
@@ -696,6 +697,7 @@ enum RightQuoteInsertionPoint<'a> {
 }
 
 impl RightQuoteInsertionPoint<'_> {
+    #[allow(dead_code)]
     fn insert_smushed(&mut self, smushed: &str) {
         match self {
             // "quoted" => "quoted,"
