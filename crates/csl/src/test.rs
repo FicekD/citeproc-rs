@@ -187,12 +187,12 @@ mod csl_1_0_2 {
 
     #[test]
     fn number_variables() {
+        // The pure CSL 1.0.2 number variables resolve to Number through AnyVariable.
+        let features = Features::new();
         parse_all::<NumberVariable>(
             "number variable",
             &["part-number", "printing-number", "supplement-number"],
         );
-        // and they resolve through AnyVariable as number variables
-        let features = Features::new();
         for s in &["part-number", "printing-number", "supplement-number"] {
             assert!(
                 matches!(
@@ -200,6 +200,22 @@ mod csl_1_0_2 {
                     Ok(AnyVariable::Number(_))
                 ),
                 "`{}` should resolve to a number variable",
+                s
+            );
+        }
+
+        // `section`/`version` are dual-listed: usable in `<number>` (so they must parse as
+        // NumberVariable) while CSL-JSON data still treats them as ordinary strings (so AnyVariable
+        // resolves them to Ordinary, Variable being tried first). This is the same pattern as
+        // `authority`, and is what lets the `<number variable="section">` styles parse.
+        parse_all::<NumberVariable>("dual-listed number variable", &["section", "version"]);
+        for s in &["section", "version"] {
+            assert!(
+                matches!(
+                    AnyVariable::get_attr(s, &features),
+                    Ok(AnyVariable::Ordinary(_))
+                ),
+                "`{}` should resolve to an ordinary variable for input data",
                 s
             );
         }
@@ -257,6 +273,8 @@ mod csl_1_0_2 {
                             <if type="software">
                                 <text variable="part-number" />
                                 <number variable="supplement-number" />
+                                <number variable="section" />
+                                <text variable="version" />
                                 <label variable="locator" />
                                 <text term="preprint" />
                             </if>

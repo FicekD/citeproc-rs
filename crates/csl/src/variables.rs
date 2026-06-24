@@ -204,7 +204,8 @@ pub enum Variable {
     /// scale of e.g. a map
     Scale,
     /// container section holding the item (e.g. “politics” for a newspaper article).
-    /// TODO: CSL-M appears to interpret this as a number variable?
+    /// In CSL 1.0.2 this is also a number variable (see `NumberVariable::Section`); the CSL-JSON
+    /// input data schema still types it as a string, so it stays here too.
     Section,
     /// from whence the item originates (e.g. a library catalog or database)
     Source,
@@ -218,7 +219,9 @@ pub enum Variable {
     ///  URL (e.g. “https://aem.asm.org/cgi/content/full/74/9/2766”)
     #[strum(serialize = "URL", serialize = "url")]
     URL,
-    /// version of the item (e.g. “2.0.9” for a software program)
+    /// version of the item (e.g. “2.0.9” for a software program).
+    /// In CSL 1.0.2 this is also a number variable (see `NumberVariable::Version`); the CSL-JSON
+    /// input data schema still types it as a string, so it stays here too.
     Version,
     /// disambiguating year suffix in author-date styles (e.g. “a” in “Doe, 1999a”)
     YearSuffix,
@@ -353,6 +356,13 @@ pub enum NumberVariable {
     PartNumber,
     PrintingNumber,
     SupplementNumber,
+
+    /// CSL 1.0.2 made `section`/`version` usable in `<number>`. They are also kept in `enum Variable`
+    /// (the CSL-JSON data schema types them as strings), so like `authority` they are dual-listed:
+    /// `AnyVariable` resolves them to `Ordinary` for input data, while `<number variable="...">`
+    /// resolves them here.
+    Section,
+    Version,
 }
 
 impl NumberVariable {
