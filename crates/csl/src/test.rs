@@ -262,6 +262,14 @@ mod csl_1_0_2 {
     }
 
     #[test]
+    fn page_range_formats() {
+        parse_all::<PageRangeFormat>(
+            "page-range-format",
+            &["chicago-15", "chicago-16"],
+        );
+    }
+
+    #[test]
     fn date_variables() {
         parse_all::<DateVariable>("date variable", &["available-date"]);
         let features = Features::new();

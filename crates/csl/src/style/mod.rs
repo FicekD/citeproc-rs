@@ -1453,7 +1453,14 @@ impl Position {
 #[derive(AsRefStr, EnumProperty, EnumString, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[strum(serialize_all = "kebab_case")]
 pub enum PageRangeFormat {
+    /// Legacy alias; CSL 1.0.2 renamed this to `chicago-15`.
     Chicago,
+    /// CSL 1.0.2 name for the 15th-edition Chicago page-range rules.
+    #[strum(serialize = "chicago-15")]
+    Chicago15,
+    /// CSL 1.0.2 name for the 16th-edition Chicago page-range rules (used by current Chicago style).
+    #[strum(serialize = "chicago-16")]
+    Chicago16,
     Expanded,
     Minimal,
     MinimalTwo,

@@ -4,7 +4,7 @@ use csl::PageRangeFormat;
 pub fn truncate_prf(prf: PageRangeFormat, first: u32, mut second: u32) -> u32 {
     second = expand(first, second);
     match prf {
-        PageRangeFormat::Chicago => {
+        PageRangeFormat::Chicago | PageRangeFormat::Chicago15 | PageRangeFormat::Chicago16 => {
             let mod100 = first % 100;
             let delta = second - first;
             if first < 100 || mod100 == 0 {
