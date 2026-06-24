@@ -1500,9 +1500,21 @@ pub enum CslType {
     Treaty,
     Webpage,
 
-    /// CSL-M only
-    #[strum(props(csl = "0", cslM = "1"))]
+    // CSL 1.0.2 types
+    Collection,
+    Document,
+    Event,
+    Performance,
+    Periodical,
+    Software,
+    Standard,
+    /// Standard since CSL 1.0.2 (previously CSL-M only)
     Classic,
+    /// Standard since CSL 1.0.2 (previously gated behind `cslm_legal_types`)
+    Hearing,
+    /// Standard since CSL 1.0.2 (previously gated behind `cslm_legal_types`)
+    Regulation,
+
     /// CSL-M only
     #[strum(props(csl = "0", cslM = "1"))]
     Video,
@@ -1510,11 +1522,5 @@ pub enum CslType {
     /// feature = "cslm_legal_types"
     #[strum(props(feature = "cslm_legal_types"))]
     Gazette,
-    /// feature = cslm_legal_types
-    #[strum(props(feature = "cslm_legal_types"))]
-    Hearing,
-    /// feature = cslm_legal_types
-    #[strum(props(feature = "cslm_legal_types"))]
-    Regulation,
 }
 impl EnumGetAttribute for CslType {}

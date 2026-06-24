@@ -491,12 +491,31 @@ pub enum LocatorType {
     Verse,
     Volume,
 
+    // CSL 1.0.2 locator types
+    Act,
+    Appendix,
+    #[strum(serialize = "article-locator")]
+    #[cfg_attr(feature = "serde", serde(rename = "article-locator"))]
+    ArticleLocator,
+    Canon,
+    Elocation,
+    Equation,
+    Scene,
+    Table,
+    Timestamp,
+    #[strum(serialize = "title-locator")]
+    #[cfg_attr(feature = "serde", serde(rename = "title-locator"))]
+    TitleLocator,
+    Version,
+    /// Standard since CSL 1.0.2 (previously gated behind `legal_locators`)
+    Rule,
+    /// Standard since CSL 1.0.2 (previously CSL-M only)
+    Supplement,
+
     #[strum(props(feature = "legal_locators"))]
     Article,
     #[strum(props(feature = "legal_locators"))]
     Subparagraph,
-    #[strum(props(feature = "legal_locators"))]
-    Rule,
     #[strum(props(feature = "legal_locators"))]
     Subsection,
     #[strum(props(feature = "legal_locators"))]
@@ -507,10 +526,6 @@ pub enum LocatorType {
     /// feature = term_unpublished
     #[strum(props(feature = "term_unpublished"))]
     Unpublished,
-
-    // Not documented but in use?
-    #[strum(props(csl = "0", cslM = "1"))]
-    Supplement,
 }
 
 impl Default for LocatorType {
@@ -702,6 +717,36 @@ pub enum MiscTerm {
     Retrieved,
     Scale,
     Version,
+
+    // CSL 1.0.2 terms
+    AdvanceOnlinePublication,
+    Album,
+    AudioRecording,
+    Bce,
+    Ce,
+    Film,
+    Henceforth,
+    LocCit,
+    NoPlace,
+    NoPublisher,
+    On,
+    OpCit,
+    OriginalWorkPublished,
+    PersonalCommunication,
+    Podcast,
+    PodcastEpisode,
+    Preprint,
+    RadioBroadcast,
+    RadioSeries,
+    RadioSeriesEpisode,
+    ReviewOf,
+    SpecialIssue,
+    SpecialSection,
+    TelevisionBroadcast,
+    TelevisionSeries,
+    TelevisionSeriesEpisode,
+    Video,
+    WorkingPaper,
 
     // not technically in the list in either spec:
 

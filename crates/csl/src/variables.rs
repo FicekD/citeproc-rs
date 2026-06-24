@@ -348,6 +348,11 @@ pub enum NumberVariable {
     // From CSL-JSON schema
     Part,
     Printing,
+
+    // CSL 1.0.2 number variables
+    PartNumber,
+    PrintingNumber,
+    SupplementNumber,
 }
 
 impl NumberVariable {
