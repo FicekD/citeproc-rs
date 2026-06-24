@@ -134,7 +134,7 @@ impl NeedVarType {
         let unknown = (
             format!("Unknown variable \"{}\"", var),
             empty.clone(),
-            Severity::Error,
+            Severity::Warning,
         );
         match *self {
 
@@ -191,6 +191,16 @@ impl InvalidCsl {
         InvalidCsl {
             range,
             severity: Severity::Error,
+            hint: "".to_string(),
+            message: message.into(),
+        }
+    }
+
+    pub fn warning(node: &Node, message: impl Into<String>) -> Self {
+        let range = node.range();
+        InvalidCsl {
+            range,
+            severity: Severity::Warning,
             hint: "".to_string(),
             message: message.into(),
         }

@@ -219,6 +219,7 @@ impl Disambiguation<Markup> for Element {
                     (seq, group_vars)
                 }
             },
+            Element::Nop => (RefIR::Edge(None), GroupVars::Missing),
             Element::Label(label) => {
                 let var = label.variable;
                 let custom = match var {

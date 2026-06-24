@@ -131,6 +131,7 @@ pub trait StyleWalker {
             Element::Names(n) => self.names(n),
             Element::Date(bd) => self.date(&*bd),
             Element::Choose(c) => self.choose(&*c),
+            Element::Nop => self.default(),
         }
     }
 }

@@ -746,9 +746,9 @@ impl ConditionParser {
     fn from_node_custom(node: &Node, info: &ParseInfo) -> Result<Self, ConditionError> {
         let (has_year_only, has_month_or_season, has_day) = if info.features.condition_date_parts {
             (
-                attribute_array_var(node, "has-year-only", NeedVarType::CondDate, info)?,
-                attribute_array_var(node, "has-month-or-season", NeedVarType::CondDate, info)?,
-                attribute_array_var(node, "has-day", NeedVarType::CondDate, info)?,
+                attribute_array_var_lenient(node, "has-year-only", info)?,
+                attribute_array_var_lenient(node, "has-month-or-season", info)?,
+                attribute_array_var_lenient(node, "has-day", info)?,
             )
         } else {
             Default::default()
@@ -759,18 +759,13 @@ impl ConditionParser {
             subjurisdictions: attribute_option_int(node, "subjurisdictions")?,
             context: attribute_option(node, "context", info)?,
             disambiguate: bool::attribute_option(node, "disambiguate", info)?,
-            variable: attribute_array_var(node, "variable", NeedVarType::Any, info)?,
-            position: attribute_array_var(node, "position", NeedVarType::CondPosition, info)?,
-            is_plural: attribute_array_var(node, "is-plural", NeedVarType::CondIsPlural, info)?,
-            csl_type: attribute_array_var(node, "type", NeedVarType::CondType, info)?,
-            locator: attribute_array_var(node, "locator", NeedVarType::CondLocator, info)?,
-            is_uncertain_date: attribute_array_var(
-                node,
-                "is-uncertain-date",
-                NeedVarType::CondDate,
-                info,
-            )?,
-            is_numeric: attribute_array_var(node, "is-numeric", NeedVarType::Any, info)?,
+            variable: attribute_array_var_lenient(node, "variable", info)?,
+            position: attribute_array_var_lenient(node, "position", info)?,
+            is_plural: attribute_array_var_lenient(node, "is-plural", info)?,
+            csl_type: attribute_array_var_lenient(node, "type", info)?,
+            locator: attribute_array_var_lenient(node, "locator", info)?,
+            is_uncertain_date: attribute_array_var_lenient(node, "is-uncertain-date", info)?,
+            is_numeric: attribute_array_var_lenient(node, "is-numeric", info)?,
             has_year_only,
             has_month_or_season,
             has_day,
@@ -778,9 +773,9 @@ impl ConditionParser {
         // technically, only a match="..." on an <if> is ignored when a <conditions> block is
         // present, but that's ok
         if cond.is_empty() {
-            Err(ConditionError::Unconditional(InvalidCsl::new(
+            Err(ConditionError::Unconditional(InvalidCsl::warning(
                 node,
-                "Unconditional <choose> branch",
+                "Unconditional <choose> branch (all conditions empty or unknown)",
             )))
         } else {
             Ok(cond)
@@ -1074,15 +1069,25 @@ impl FromNode for BodyDate {
 
 impl FromNode for Element {
     fn from_node(node: &Node, info: &ParseInfo) -> FromNodeResult<Self> {
-        match node.tag_name().name() {
-            "text" => Ok(Element::Text(TextElement::from_node(node, info)?)),
-            "label" => Ok(Element::Label(LabelElement::from_node(node, info)?)),
-            "number" => Ok(Element::Number(NumberElement::from_node(node, info)?)),
-            "group" => Ok(Element::Group(Group::from_node(node, info)?)),
-            "names" => Ok(Element::Names(Arc::new(Names::from_node(node, info)?))),
-            "choose" => Ok(choose_el(node, info)?),
-            "date" => Ok(Element::Date(Arc::new(BodyDate::from_node(node, info)?))),
-            _ => Err(InvalidCsl::new(node, "Unrecognised node.").into()),
+        let result = match node.tag_name().name() {
+            "text" => TextElement::from_node(node, info).map(Element::Text),
+            "label" => LabelElement::from_node(node, info).map(Element::Label),
+            "number" => NumberElement::from_node(node, info).map(Element::Number),
+            "group" => Group::from_node(node, info).map(Element::Group),
+            "names" => Names::from_node(node, info).map(|n| Element::Names(Arc::new(n))),
+            "choose" => choose_el(node, info),
+            "date" => BodyDate::from_node(node, info).map(|d| Element::Date(Arc::new(d))),
+            _ => return Err(InvalidCsl::new(node, "Unrecognised node.").into()),
+        };
+        match result {
+            Ok(el) => Ok(el),
+            Err(ref e) if e.0.iter().all(|err| err.severity == Severity::Warning) => {
+                for w in &e.0 {
+                    warn!("CSL: skipping element with unknown attribute: {}", w.message);
+                }
+                Ok(Element::Nop)
+            }
+            Err(e) => Err(e),
         }
     }
 }
@@ -1180,7 +1185,7 @@ impl FromNode for Names {
         }
 
         Ok(Names {
-            variables: attribute_array_var(node, "variable", NeedVarType::Name, info)?,
+            variables: attribute_array_var_lenient(node, "variable", info)?,
             name,
             institution,
             with,

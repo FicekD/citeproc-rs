@@ -91,6 +91,9 @@ pub enum Element {
     Names(Arc<Names>),
     /// <cs:date>
     Date(Arc<BodyDate>),
+    /// An element that referenced an unknown variable/type and renders nothing.
+    /// Produced by the lenient parser when forward-compatible degradation is needed.
+    Nop,
 }
 
 #[derive(Debug, Eq, Clone, PartialEq)]

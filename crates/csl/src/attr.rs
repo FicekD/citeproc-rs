@@ -188,6 +188,7 @@ pub(crate) fn attribute_optional<T: Default + GetAttribute>(
     T::attribute_default(node, attr, info)
 }
 
+#[allow(dead_code)]
 pub(crate) fn attribute_array_var<T: GetAttribute>(
     node: &Node,
     attr: &'static str,
@@ -212,6 +213,27 @@ pub(crate) fn attribute_array_var<T: GetAttribute>(
                 )),
             }
         }
+        None => Ok(vec![]),
+    }
+}
+
+pub(crate) fn attribute_array_var_lenient<T: GetAttribute>(
+    node: &Node,
+    attr: &'static str,
+    info: &ParseInfo,
+) -> Result<Vec<T>, InvalidCsl> {
+    match node.attribute(attr) {
+        Some(array) => Ok(array
+            .split(' ')
+            .filter(|a| !a.is_empty())
+            .filter_map(|a| match T::get_attr(a, &info.features) {
+                Ok(v) => Some(v),
+                Err(e) => {
+                    warn!("CSL: skipping unknown value {:?} for {:?}", e.value, attr);
+                    None
+                }
+            })
+            .collect()),
         None => Ok(vec![]),
     }
 }

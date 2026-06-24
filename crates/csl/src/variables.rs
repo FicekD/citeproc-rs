@@ -477,7 +477,7 @@ pub enum DateVariable {
     /// feature = var_publications
     #[strum(props(feature = "var_publications"))]
     PublicationDate,
-    /// feature = var_publications
-    #[strum(props(feature = "var_publications"))]
+    /// date when the item first became available (e.g. online before print)
+    /// CSL 1.0.2 standard date variable (previously gated behind `var_publications`)
     AvailableDate,
 }

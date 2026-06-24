@@ -261,6 +261,19 @@ mod csl_1_0_2 {
         );
     }
 
+    #[test]
+    fn date_variables() {
+        parse_all::<DateVariable>("date variable", &["available-date"]);
+        let features = Features::new();
+        assert!(
+            matches!(
+                AnyVariable::get_attr("available-date", &features),
+                Ok(AnyVariable::Date(_))
+            ),
+            "`available-date` should resolve to a date variable"
+        );
+    }
+
     /// End-to-end: a style branching on a CSL 1.0.2 type and rendering 1.0.2 variables/terms must
     /// parse as a whole, with no features enabled.
     #[test]
@@ -277,6 +290,7 @@ mod csl_1_0_2 {
                                 <text variable="version" />
                                 <label variable="locator" />
                                 <text term="preprint" />
+                                <date variable="available-date" />
                             </if>
                         </choose>
                     </layout>
@@ -285,6 +299,98 @@ mod csl_1_0_2 {
         "#;
         crate::Style::parse_for_test(xml, None)
             .expect("CSL 1.0.2 style should parse successfully");
+    }
+}
+
+mod lenient_parser {
+    use super::*;
+
+    fn parse_style(xml: &str) -> crate::Style {
+        crate::Style::parse_for_test(xml, None)
+            .expect("style should parse despite unknown attributes")
+    }
+
+    #[test]
+    fn unknown_text_variable_becomes_nop() {
+        let style = parse_style(r#"
+            <style version="1.0" class="in-text">
+                <citation>
+                    <layout>
+                        <text variable="totally-unknown-future-variable" />
+                        <text variable="title" />
+                    </layout>
+                </citation>
+            </style>
+        "#);
+        let elements = &style.citation.layout.elements;
+        assert_eq!(elements.len(), 2, "both elements should be present (one as Nop)");
+        assert!(
+            matches!(elements[0], Element::Nop),
+            "unknown variable should become Element::Nop"
+        );
+        assert!(
+            matches!(elements[1], Element::Text(_)),
+            "known variable should remain as Element::Text"
+        );
+    }
+
+    #[test]
+    fn unknown_number_variable_becomes_nop() {
+        let style = parse_style(r#"
+            <style version="1.0" class="in-text">
+                <citation>
+                    <layout>
+                        <number variable="totally-unknown-number-var" />
+                    </layout>
+                </citation>
+            </style>
+        "#);
+        let elements = &style.citation.layout.elements;
+        assert!(
+            matches!(elements[0], Element::Nop),
+            "unknown number variable should become Element::Nop"
+        );
+    }
+
+    #[test]
+    fn unknown_type_in_condition_is_filtered() {
+        let style = parse_style(r#"
+            <style version="1.0" class="in-text">
+                <citation>
+                    <layout>
+                        <choose>
+                            <if type="totally-unknown-future-type article-journal">
+                                <text variable="title" />
+                            </if>
+                        </choose>
+                    </layout>
+                </citation>
+            </style>
+        "#);
+        let elements = &style.citation.layout.elements;
+        assert!(
+            matches!(elements[0], Element::Choose(_)),
+            "choose with mixed known/unknown types should still parse"
+        );
+    }
+
+    #[test]
+    fn unknown_names_variable_is_filtered() {
+        let style = parse_style(r#"
+            <style version="1.0" class="in-text">
+                <citation>
+                    <layout>
+                        <names variable="author totally-unknown-name-var" />
+                    </layout>
+                </citation>
+            </style>
+        "#);
+        let elements = &style.citation.layout.elements;
+        if let Element::Names(names) = &elements[0] {
+            assert_eq!(names.variables.len(), 1, "unknown name variable should be filtered");
+        } else {
+            panic!("expected Element::Names");
+        }
     }
 }
 

@@ -255,6 +255,8 @@ where
                     .maybe_suppress_date(var, |state| Some(dt.intermediate(db, state, ctx, arena)));
                 o.unwrap_or_else(|| arena.new_node((IR::Rendered(None), GroupVars::Missing)))
             }
+
+            Element::Nop => arena.new_node((IR::Rendered(None), GroupVars::Missing)),
         }
     }
 }
