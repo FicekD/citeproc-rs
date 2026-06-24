@@ -586,8 +586,8 @@ impl TextTermSelector {
 
 impl FromNode for TextTermSelector {
     fn from_node(node: &Node, info: &ParseInfo) -> FromNodeResult<Self> {
-        // we already know term is on there
-        let term = attribute_required(node, "term", info)?;
+        // we already know term is on there; use warn-unknown so unknown terms degrade to Nop
+        let term = attribute_required_warn_unknown(node, "term", info)?;
         Ok(TextTermSelector::from_term_and_form(
             &term,
             || TermForm::from_node(node, info),

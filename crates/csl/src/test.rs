@@ -375,6 +375,26 @@ mod lenient_parser {
     }
 
     #[test]
+    fn unknown_term_becomes_nop() {
+        let style = parse_style(r#"
+            <style version="1.0" class="in-text">
+                <citation>
+                    <layout>
+                        <text term="patent" />
+                        <text term="manuscript" />
+                        <text term="ibid" />
+                    </layout>
+                </citation>
+            </style>
+        "#);
+        let elements = &style.citation.layout.elements;
+        assert_eq!(elements.len(), 3);
+        assert!(matches!(elements[0], Element::Nop), "unknown term 'patent' → Nop");
+        assert!(matches!(elements[1], Element::Nop), "unknown term 'manuscript' → Nop");
+        assert!(matches!(elements[2], Element::Text(_)), "known term 'ibid' → Text");
+    }
+
+    #[test]
     fn unknown_names_variable_is_filtered() {
         let style = parse_style(r#"
             <style version="1.0" class="in-text">

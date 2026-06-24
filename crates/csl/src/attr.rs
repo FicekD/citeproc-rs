@@ -145,6 +145,26 @@ pub(crate) fn attribute_required<T: GetAttribute>(
     }
 }
 
+/// Like `attribute_required`, but unknown values produce `Severity::Warning` rather than `Error`,
+/// so the all-warning path in `Element::from_node` can degrade them to `Element::Nop`.
+pub(crate) fn attribute_required_warn_unknown<T: GetAttribute>(
+    node: &Node,
+    attr: impl Into<ExpName>,
+    info: &ParseInfo,
+) -> Result<T, InvalidCsl> {
+    let attr = attr.into();
+    match node.attribute(attr) {
+        Some(a) => match T::get_attr(a, &info.features) {
+            Ok(val) => Ok(val),
+            Err(e) => Err(InvalidCsl::warning(
+                node,
+                format!("Unknown value {:?} for {:?} — element will be skipped", e.value, attr),
+            )),
+        },
+        None => Err(InvalidCsl::missing(node, attr)),
+    }
+}
+
 use super::variables::*;
 
 pub(crate) fn attribute_var_type<T: GetAttribute>(
