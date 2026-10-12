@@ -16,7 +16,7 @@ pub enum LocaleSource {
 
 /// A parsable representation of `xml:lang`.
 ///
-/// See http://www.datypic.com/sc/xsd/t-xsd_language.html
+/// See <http://www.datypic.com/sc/xsd/t-xsd_language.html>
 #[derive(Debug, Clone, Eq, PartialEq, Hash, PartialOrd, Ord)]
 pub enum Lang {
     /// ISO 639 language code, + optional hyphen and 2-letter ISO 3166 country code.

@@ -7,7 +7,7 @@
 //! Conversion between integers and roman numerals.
 //!
 //! Duplicated because we want lowercase by default to work with text-casing.
-//! Original, 'unlicensed': https://github.com/linfir/roman.rs
+//! Original, 'unlicensed': <https://github.com/linfir/roman.rs>
 
 #![allow(dead_code)]
 

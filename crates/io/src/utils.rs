@@ -68,7 +68,7 @@ where
 }
 
 /// Slightly optimised version of Intercalate that can use Vec::with_capacity().
-/// When specialization is stable: https://github.com/rust-lang/rust/issues/31844
+/// When specialization is stable: <https://github.com/rust-lang/rust/issues/31844>
 /// you could reimplement this as a specialization for I: ExactSizeIterator.
 pub trait IntercalateExact<T> {
     fn intercalate_exact(self, sep: &T) -> Vec<T>;

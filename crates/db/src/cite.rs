@@ -101,7 +101,7 @@ pub enum CiteData {
         cite: Arc<Cite<Markup>>,
     },
     /// These are created as necessary when uncited items need to be rendered for disambiguation.
-    /// The Arc<Cite> is the null object pattern, used merely to hold a reference id but keep the
+    /// The `Arc<Cite>` is the null object pattern, used merely to hold a reference id but keep the
     /// cite IR rendering identical for ghost and real cites.
     BibliographyGhost { cite: Arc<Cite<Markup>> },
 }

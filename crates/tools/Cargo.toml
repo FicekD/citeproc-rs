@@ -7,7 +7,8 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [features]
-# inspect = ["test_utils"]
+# The inspect binary needs the test_utils crate, which no longer exists, so it does not build.
+inspect = []
 
 [[bin]]
 name = "inspect"
@@ -16,7 +17,7 @@ required-features = ["inspect"]
 
 [dependencies]
 directories = "3.0.1"
-git2 = "0.13.11"
+git2 = "0.20"
 anyhow = "1.0.32"
 # latest release on crates.io doesn't support Ignored yet
 cargo-suity = { git = "https://github.com/andoriyu/cargo-suity", branch = "master", version = "0.2.1" }
@@ -28,7 +29,6 @@ once_cell = "1.4.1"
 serde_derive = "1.0.116"
 clap = "2.33.3"
 env_logger = "0.7.1"
-serde_sexpr = "0.1.0"
 ucd-parse = "0.1.8"
 csl = { path = "../csl" }
 regex = "1.3.9"

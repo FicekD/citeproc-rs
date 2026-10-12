@@ -31,7 +31,7 @@ fn trim_affixes(affixes: &Affixes, trim_end_https: fn(&str) -> Option<&str>) -> 
     })
 }
 
-/// Returns a parsed link, and (if necessary) rewritten Affixes with e.g. https://doi.org/ removed
+/// Returns a parsed link, and (if necessary) rewritten Affixes with e.g. `https://doi.org/` removed
 ///
 /// The affixes returned will be None if it was not necessary to rewrite them.
 pub fn try_link_affixed(

@@ -4,19 +4,6 @@
 //
 // Copyright © 2018 Corporation for Digital Scholarship
 
-use cfg_if::cfg_if;
-cfg_if! {
-    if #[cfg(feature="jemalloc")] {
-        use jemallocator::Jemalloc;
-        #[global_allocator]
-        static A: Jemalloc = Jemalloc;
-    } else {
-        use std::alloc::System;
-        #[global_allocator]
-        static A: System = System;
-    }
-}
-
 #[macro_use]
 extern crate criterion;
 
@@ -53,10 +40,6 @@ fn common_reference(n: u32) -> Reference {
         DateOrRange::from_str("1998-01-04").unwrap(),
     );
     refr
-}
-
-fn fetcher() -> Arc<dyn LocaleFetcher> {
-    Arc::new(citeproc_db::PredefinedLocales::bundled_en_us())
 }
 
 static AGLC: &'static str = include_str!("./data/australian-guide-to-legal-citation.csl");
@@ -103,8 +86,8 @@ fn bench_build_cluster(b: &mut Bencher, style: &str) {
     })
     .unwrap();
     proc.insert_reference(common_reference(1));
-    let cite_id = basic_cluster_get_cite_id(&mut proc, 1, "id_1");
-    let cluster_id = ClusterId::new(1);
+    let cluster_id = proc.cluster_id("1");
+    let cite_id = basic_cluster_get_cite_id(&mut proc, cluster_id, "id_1");
     proc.set_cluster_order(&[ClusterPosition::note(cluster_id, 1)])
         .unwrap();
     b.iter(move || invalidate_rebuild_cluster(&mut proc, cluster_id, cite_id));

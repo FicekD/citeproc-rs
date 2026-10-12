@@ -149,7 +149,7 @@ pub enum Variable {
     CitationLabel,
     /// title of the collection holding the item (e.g. the series title for a book)
     CollectionTitle,
-    /// Not technically part of the spec, but https://forums.zotero.org/discussion/75366/accommodating-both-full-series-names-and-series-abbreviations
+    /// Not technically part of the spec, but <https://forums.zotero.org/discussion/75366/accommodating-both-full-series-names-and-series-abbreviations>
     CollectionTitleShort,
     /// title of the container holding the item (e.g. the book title for a book chapter, the journal title for a journal article)
     ContainerTitle,
@@ -216,7 +216,7 @@ pub enum Variable {
     /// short/abbreviated form of “title” (also accessible through the “short” form of the “title” variable)
     #[strum(serialize = "title-short", serialize = "shortTitle")]
     TitleShort,
-    ///  URL (e.g. “https://aem.asm.org/cgi/content/full/74/9/2766”)
+    ///  URL (e.g. `https://aem.asm.org/cgi/content/full/74/9/2766`)
     #[strum(serialize = "URL", serialize = "url")]
     URL,
     /// version of the item (e.g. “2.0.9” for a software program).
@@ -274,7 +274,7 @@ pub enum Variable {
     ///
     /// TODO: I think variable="gazette-flag" may have been superseded by type="gazette",
     /// but clearly you can still tick the "Gazette Ref" checkbox in Juris-M on a statute.
-    /// Ask Frank. See also https://juris-m.github.io/cheat-sheets/us.pdf
+    /// Ask Frank. See also <https://juris-m.github.io/cheat-sheets/us.pdf>
     #[strum(props(csl = "0", cslM = "1"))]
     GazetteFlag,
 

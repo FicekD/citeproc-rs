@@ -122,7 +122,7 @@ impl BodyDate {
     }
 }
 
-/// e.g. for <text variable="title" form="short" />
+/// e.g. for `<text variable="title" form="short" />`
 #[derive(AsRefStr, EnumString, EnumProperty, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[strum(serialize_all = "kebab_case")]
 pub enum VariableForm {

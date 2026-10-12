@@ -7,7 +7,7 @@
 //! The cs:info element contains the style’s metadata. Its structure is based on the Atom
 //! Syndication Format. In independent styles, cs:info has the following child elements:
 //! - cs:id (mandatory) - a URI (but in practice only a URL)
-//! - cs:title (mandatory) [xml:lang]
+//! - cs:title (mandatory) \[xml:lang\]
 //! - cs:title-short
 //! - cs:updated (mandatory)
 //! - cs:category
@@ -16,8 +16,8 @@
 //!     cs:uri each may appear once. These child elements should contain respectively the name,
 //!     email address and URI of the author or contributor.
 //! - cs:issn, cs:eissn, cs:issnl
-//! - cs:link rel="self | template | documentation" href="URI" [xml:lang]
-//! - cs:rights [xml:lang]
+//! - cs:link rel="self | template | documentation" href="URI" \[xml:lang\]
+//! - cs:rights \[xml:lang\]
 //! - cs:summary
 //!
 //! In dependent styles:

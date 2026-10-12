@@ -88,7 +88,7 @@ impl SkipIdField for SmartString {
 
 /// See [Special Citation Forms](https://citeproc-js.readthedocs.io/en/latest/running.html#special-citation-forms)
 ///
-/// A cluster with no id. [[Cluster::preview]]
+/// A cluster with no id, see [`ClusterPosition::preview_in_text`] and [`ClusterPosition::preview_note`].
 ///
 /// ```
 /// use serde::Deserialize;

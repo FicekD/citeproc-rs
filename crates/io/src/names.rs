@@ -247,12 +247,6 @@ impl From<PersonNameInput> for PersonName {
 
 #[test]
 fn parse_particles() {
-    impl PersonNameInput {
-        fn parse_particles(self) -> PersonName {
-            self.into()
-        }
-    }
-
     env_logger::init();
 
     let mut hi: String = " hi ".into();
@@ -265,7 +259,7 @@ fn parse_particles() {
         ..Default::default()
     };
     assert_eq!(
-        init.parse_particles(),
+        PersonName::from(init),
         PersonName {
             given: Some("Schnitzel".into()),
             non_dropping_particle: Some("von".into()),
@@ -281,7 +275,7 @@ fn parse_particles() {
         ..Default::default()
     };
     assert_eq!(
-        init.parse_particles(),
+        PersonName::from(init),
         PersonName {
             given: Some("Eric".into()),
             non_dropping_particle: Some("van der".into()),
@@ -297,7 +291,7 @@ fn parse_particles() {
         ..Default::default()
     };
     assert_eq!(
-        init.parse_particles(),
+        PersonName::from(init),
         PersonName {
             given: Some("Eric".into()),
             non_dropping_particle: Some("del".into()),
@@ -313,7 +307,7 @@ fn parse_particles() {
         ..Default::default()
     };
     assert_eq!(
-        init.parse_particles(),
+        PersonName::from(init),
         PersonName {
             given: Some("Givenname".into()),
             dropping_particle: Some("d\u{2019}".into()),
@@ -329,7 +323,7 @@ fn parse_particles() {
         ..Default::default()
     };
     assert_eq!(
-        init.parse_particles(),
+        PersonName::from(init),
         PersonName {
             given: Some("Givenname".into()),
             dropping_particle: Some("de".into()),
@@ -345,7 +339,7 @@ fn parse_particles() {
         ..Default::default()
     };
     assert_eq!(
-        init.parse_particles(),
+        PersonName::from(init),
         PersonName {
             given: Some("François Hédelin".into()),
             dropping_particle: Some("d\u{2019}".into()),
@@ -361,7 +355,7 @@ fn parse_particles() {
         ..Default::default()
     };
     assert_eq!(
-        init.parse_particles(),
+        PersonName::from(init),
         PersonName {
             given: Some("François Hédelin".into()),
             non_dropping_particle: Some("d\u{2019}".into()),
@@ -377,7 +371,7 @@ fn parse_particles() {
         ..Default::default()
     };
     assert_eq!(
-        init.parse_particles(),
+        PersonName::from(init),
         PersonName {
             given: Some("Dick".into()),
             family: Some("Van Dyke".into()),
@@ -391,7 +385,7 @@ fn parse_particles() {
         ..Default::default()
     };
     assert_eq!(
-        init.parse_particles(),
+        PersonName::from(init),
         PersonName {
             family: Some("강".into()),
             given: Some("소라".into()),
@@ -401,7 +395,7 @@ fn parse_particles() {
     );
 }
 
-/// https://users.rust-lang.org/t/trim-string-in-place/15809/8
+/// <https://users.rust-lang.org/t/trim-string-in-place/15809/8>
 pub trait TrimInPlace {
     fn trim_in_place(self: &'_ mut Self);
     // Returns number of bytes trimmed, if any

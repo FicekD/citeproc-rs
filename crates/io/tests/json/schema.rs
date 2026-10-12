@@ -1,3 +1,7 @@
+// Many fields are never read. They still decide which untagged variant a schema node
+// deserializes into, so they stay.
+#![allow(dead_code)]
+
 use serde::Deserialize;
 use serde_json::Value;
 use std::collections::HashMap;

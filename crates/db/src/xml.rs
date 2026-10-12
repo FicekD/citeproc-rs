@@ -35,7 +35,7 @@ pub trait StyleDatabase {
     /// First one is the inherited names-delimiter
     fn name_info_bibliography(&self) -> (Option<SmartString>, Arc<Name>);
 
-    /// Lists every <names> block in the style, with each name variable it is used for
+    /// Lists every `<names>` block in the style, with each name variable it is used for
     fn name_configurations(&self) -> Arc<Vec<(NameVariable, Name)>>;
 }
 
