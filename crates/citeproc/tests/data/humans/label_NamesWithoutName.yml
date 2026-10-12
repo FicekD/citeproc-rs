@@ -1,0 +1,36 @@
+mode: bibliography
+result: |-
+  <div class="csl-bib-body">
+    <div class="csl-entry">In: Andrea Vedaldi, Horst Bischof, eds. Computer Vision. translated by John Smith.</div>
+    <div class="csl-entry">In: Andrea Vedaldi, ed. Computer Vision.</div>
+  </div>
+input:
+  - id: ITEM-1
+    type: chapter
+    container-title: Computer Vision
+    editor: [{ family: Vedaldi, given: Andrea }, { family: Bischof, given: Horst }]
+    translator: [{ family: Smith, given: John }]
+  - id: ITEM-2
+    type: chapter
+    container-title: Computer Vision
+    editor: [{ family: Vedaldi, given: Andrea }]
+csl: |
+  <?xml version="1.0" encoding="utf-8"?>
+  <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="en-US">
+    <info><id>https://cormacrelf.net/citeproc-rs/test-style</id><title>test-style</title></info>
+    <citation><layout><text variable="title" /></layout></citation>
+    <bibliography>
+      <layout suffix=".">
+        <group delimiter=". ">
+          <names variable="editor" prefix="In: ">
+            <label form="short" prefix=", " />
+          </names>
+          <text variable="container-title" />
+          <names variable="translator">
+            <label form="verb" suffix=" " />
+            <name />
+          </names>
+        </group>
+      </layout>
+    </bibliography>
+  </style>

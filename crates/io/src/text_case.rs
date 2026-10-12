@@ -241,7 +241,7 @@ fn transform_sentence_case(s: String, seen_one: bool, is_last: bool, is_uppercas
             &s,
             seen_one,
             is_last,
-            |word, _word_and_rest, is_first, _no_stop| {
+            |word, _word_and_rest, is_first, _no_stop, _after_hyphen| {
                 if is_first {
                     if let Some(upper) = upper_word_to_title(word) {
                         return (SmartCow::Owned(upper), None);
@@ -260,8 +260,13 @@ fn title_case_word<'a>(
     word_and_rest: &'a str,
     entire_is_uppercase: bool,
     no_stopword: bool,
+    after_hyphen: bool,
 ) -> (SmartCow<'a>, Option<usize>) {
     if !no_stopword {
+        // The second half of a hyphenated compound, like the "to" in "End-to-End"
+        if after_hyphen && is_stopword(word) == Some(word.len()) {
+            return (lazy::lazy_lowercase(word), None);
+        }
         if let Some(mut match_len) = is_stopword(word_and_rest) {
             // drop the trailing whitespace
             let matched = &word_and_rest[..match_len];
@@ -300,15 +305,15 @@ fn transform_title_case(s: &str, seen_one: bool, is_last: bool) -> String {
         &s,
         seen_one,
         is_last,
-        |word, word_and_rest, _is_first, no_stop| {
-            title_case_word(word, word_and_rest, false, no_stop)
+        |word, word_and_rest, _is_first, no_stop, after_hyphen| {
+            title_case_word(word, word_and_rest, false, no_stop, after_hyphen)
         },
     )
 }
 
 fn transform_each_word<'a, F>(mut s: &'a str, seen_one: bool, is_last: bool, transform: F) -> String
 where
-    F: Fn(&'a str, &'a str, bool, bool) -> (SmartCow<'a>, Option<usize>),
+    F: Fn(&'a str, &'a str, bool, bool, bool) -> (SmartCow<'a>, Option<usize>),
 {
     let mut acc = String::new();
     let mut is_first = !seen_one;
@@ -336,7 +341,8 @@ where
             let is_last = is_last && (rest.is_empty() || !is_word(rest));
             let no_stopword = is_first || is_last || follows_colon;
             let word = substr;
-            let (tx, fast_forward) = transform(word, &s[ix..], is_first, no_stopword);
+            let after_hyphen = *immediate_before == Some('-');
+            let (tx, fast_forward) = transform(word, &s[ix..], is_first, no_stopword, after_hyphen);
             acc.push_str(&tx);
             if let Some(ff) = fast_forward {
                 s = &s[ix + ff..];
@@ -511,7 +517,7 @@ impl IngestOptions {
             // Fallback is nothing
             TextCase::Title if self.is_english => transform_title_case(&s, seen_one, is_last),
             TextCase::CapitalizeAll => {
-                transform_each_word(&s, seen_one, is_last, |word, _, _, _| {
+                transform_each_word(&s, seen_one, is_last, |word, _, _, _, _| {
                     (transform_uppercase_first(word), None)
                 })
             }

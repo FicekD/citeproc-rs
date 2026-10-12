@@ -1,0 +1,35 @@
+# citeproc-js 2.4.63 does not know the CSL 1.0.2 "timestamp" locator and prints a bare "Title" on the first line.
+mode: citation
+result: |-
+  Title at 12:30
+  Title, p. 5
+  Title, l. 7
+  Title
+input:
+  - id: ITEM-1
+    type: motion_picture
+    title: Title
+clusters:
+  - [{ id: ITEM-1, locator: "12:30", label: timestamp }]
+  - [{ id: ITEM-1, locator: "5", label: page }]
+  - [{ id: ITEM-1, locator: "7", label: line }]
+  - [{ id: ITEM-1 }]
+csl: |
+  <?xml version="1.0" encoding="utf-8"?>
+  <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0.2" default-locale="en-US">
+    <info><id>https://cormacrelf.net/citeproc-rs/test-style</id><title>test-style</title></info>
+    <citation>
+      <layout>
+        <text variable="title" />
+        <choose>
+          <if locator="timestamp">
+            <text variable="locator" prefix=" at " />
+          </if>
+          <else-if locator="page line table" match="any">
+            <label variable="locator" form="short" prefix=", " suffix=" " />
+            <text variable="locator" />
+          </else-if>
+        </choose>
+      </layout>
+    </citation>
+  </style>

@@ -1,0 +1,48 @@
+mode: citation
+result: |-
+  book or chapter with title: A
+  book or chapter with title: B
+  other: C
+  none of them: D
+input:
+  - id: ITEM-1
+    type: book
+    title: A
+  - id: ITEM-2
+    type: chapter
+    title: B
+  - id: ITEM-3
+    type: article-journal
+    title: C
+  - id: ITEM-4
+    type: report
+    title: D
+clusters:
+  - [{ id: ITEM-1 }]
+  - [{ id: ITEM-2 }]
+  - [{ id: ITEM-3 }]
+  - [{ id: ITEM-4 }]
+csl: |
+  <?xml version="1.0" encoding="utf-8"?>
+  <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="en-US">
+    <info><id>https://cormacrelf.net/citeproc-rs/test-style</id><title>test-style</title></info>
+    <citation>
+      <layout>
+        <choose>
+          <if type="book chapter" variable="title">
+            <text value="book or chapter with title: " />
+          </if>
+          <else-if type="article-journal article-magazine" match="any">
+            <text value="other: " />
+          </else-if>
+          <else-if type="report" variable="issue" match="none">
+            <text value="never: " />
+          </else-if>
+          <else-if type="book chapter thesis" match="none">
+            <text value="none of them: " />
+          </else-if>
+        </choose>
+        <text variable="title" />
+      </layout>
+    </citation>
+  </style>

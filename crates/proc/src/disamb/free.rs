@@ -13,7 +13,7 @@ use fnv::FnvHashSet;
 
 bitflags::bitflags! {
     /// A convenient enum of the only conds that can actually change between cites
-    pub struct FreeCond: u64 {
+    pub struct FreeCond: u128 {
         const YEAR_SUFFIX        = 1;
         const YEAR_SUFFIX_FALSE   = 1 << 1;
 
@@ -33,84 +33,159 @@ bitflags::bitflags! {
         const LOCATOR           = 1 << 14;
         const LOCATOR_FALSE      = 1 << 15;
 
-        const LT_BOOK               = 1 << 16;
-        const LT_BOOK_FALSE         = 1 << 17;
-        const LT_CHAPTER        = 1 << 18;
-        const LT_CHAPTER_FALSE  = 1 << 19;
-        const LT_COLUMN     = 1 << 20;
-        const LT_COLUMN_FALSE = 1 << 21;
-        const LT_FIGURE     = 1 << 22;
-        const LT_FIGURE_FALSE = 1 << 23;
-        const LT_FOLIO  = 1 << 24;
-        const LT_FOLIO_FALSE = 1 << 25;
-        const LT_ISSUE  = 1 << 26;
-        const LT_ISSUE_FALSE = 1 << 27;
-        const LT_LINE   = 1 << 28;
-        const LT_LINE_FALSE = 1 << 29;
-        const LT_NOTE   = 1 << 30;
-        const LT_NOTE_FALSE = 1 << 31;
-        const LT_OPUS   = 1 << 32;
-        const LT_OPUS_FALSE = 1 << 33;
-        const LT_PAGE   = 1 << 34;
-        const LT_PAGE_FALSE = 1 << 35;
-        const LT_PARAGRAPH  = 1 << 36;
-        const LT_PARAGRAPH_FALSE = 1 << 37;
-        const LT_PART   = 1 << 38;
-        const LT_PART_FALSE = 1 << 39;
-        const LT_SECTION     = 1 << 40;
-        const LT_SECTION_FALSE = 1 << 41;
-        const LT_SUBVERBO   = 1 << 41;
-        const LT_SUBVERBO_FALSE = 1 << 43;
-        const LT_VERSE  = 1 << 44;
-        const LT_VERSE_FALSE = 1 << 45;
-        const LT_VOLUME     = 1 << 46;
-        const LT_VOLUME_FALSE = 1 << 47;
+        const DISAMBIGUATE = 1 << 16;
+        const DISAMBIGUATE_FALSE = 1 << 17;
 
-        const DISAMBIGUATE = 1 << 48;
-        const DISAMBIGUATE_FALSE = 1 << 49;
+        // Locator types occupy every bit from LT_SHIFT upwards.
+        const LT_BOOK               = 1 << 18;
+        const LT_BOOK_FALSE         = 1 << 19;
+        const LT_CHAPTER        = 1 << 20;
+        const LT_CHAPTER_FALSE  = 1 << 21;
+        const LT_COLUMN     = 1 << 22;
+        const LT_COLUMN_FALSE = 1 << 23;
+        const LT_FIGURE     = 1 << 24;
+        const LT_FIGURE_FALSE = 1 << 25;
+        const LT_FOLIO  = 1 << 26;
+        const LT_FOLIO_FALSE = 1 << 27;
+        const LT_ISSUE  = 1 << 28;
+        const LT_ISSUE_FALSE = 1 << 29;
+        const LT_LINE   = 1 << 30;
+        const LT_LINE_FALSE = 1 << 31;
+        const LT_NOTE   = 1 << 32;
+        const LT_NOTE_FALSE = 1 << 33;
+        const LT_OPUS   = 1 << 34;
+        const LT_OPUS_FALSE = 1 << 35;
+        const LT_PAGE   = 1 << 36;
+        const LT_PAGE_FALSE = 1 << 37;
+        const LT_PARAGRAPH  = 1 << 38;
+        const LT_PARAGRAPH_FALSE = 1 << 39;
+        const LT_PART   = 1 << 40;
+        const LT_PART_FALSE = 1 << 41;
+        const LT_SECTION     = 1 << 42;
+        const LT_SECTION_FALSE = 1 << 43;
+        const LT_SUBVERBO   = 1 << 44;
+        const LT_SUBVERBO_FALSE = 1 << 45;
+        const LT_VERSE  = 1 << 46;
+        const LT_VERSE_FALSE = 1 << 47;
+        const LT_VOLUME     = 1 << 48;
+        const LT_VOLUME_FALSE = 1 << 49;
 
-        // TODO(CSL-M): enable these
+        // CSL 1.0.2
+        const LT_ACT = 1 << 50;
+        const LT_ACT_FALSE = 1 << 51;
+        const LT_APPENDIX = 1 << 52;
+        const LT_APPENDIX_FALSE = 1 << 53;
+        const LT_ARTICLE_LOCATOR = 1 << 54;
+        const LT_ARTICLE_LOCATOR_FALSE = 1 << 55;
+        const LT_CANON = 1 << 56;
+        const LT_CANON_FALSE = 1 << 57;
+        const LT_ELOCATION = 1 << 58;
+        const LT_ELOCATION_FALSE = 1 << 59;
+        const LT_EQUATION = 1 << 60;
+        const LT_EQUATION_FALSE = 1 << 61;
+        const LT_SCENE = 1 << 62;
+        const LT_SCENE_FALSE = 1 << 63;
+        const LT_TABLE = 1 << 64;
+        const LT_TABLE_FALSE = 1 << 65;
+        const LT_TIMESTAMP = 1 << 66;
+        const LT_TIMESTAMP_FALSE = 1 << 67;
+        const LT_TITLE_LOCATOR = 1 << 68;
+        const LT_TITLE_LOCATOR_FALSE = 1 << 69;
+        const LT_VERSION = 1 << 70;
+        const LT_VERSION_FALSE = 1 << 71;
+        const LT_RULE = 1 << 72;
+        const LT_RULE_FALSE = 1 << 73;
+        const LT_SUPPLEMENT = 1 << 74;
+        const LT_SUPPLEMENT_FALSE = 1 << 75;
 
-        // const LT_ARTICLE    = 1 << 48;
-        // const LT_ARTICLE_FALSE1 << 49;
-        // const LT_SUBPARAGRAPH   = 1 << 50;
-        // const LT_SUBPARAGRAPH_FALSE << 51;
-        // const LT_RULE   = 1 << 52;
-        // const LT_RULE_FALSE << 53;
-        // const LT_SUBSECTION     = 1 << 54;
-        // const LT_SUBSECTION_FALSE 1 << 55;
-        // const LT_SCHEDULE   = 1 << 56;
-        // const LT_SCHEDULE_FALSE << 57;
-        // const LT_TITLE  = 1 << 58;
-        // const LT_TITLE_FALSE<< 59;
-        // const LT_SUPPLEMENT     = 1 << 60;
-        // const LT_SUPPLEMENT_FALSE 1 << 61;
+        // CSL-M legal locators and term_unpublished
+        const LT_ARTICLE = 1 << 76;
+        const LT_ARTICLE_FALSE = 1 << 77;
+        const LT_SUBPARAGRAPH = 1 << 78;
+        const LT_SUBPARAGRAPH_FALSE = 1 << 79;
+        const LT_SUBSECTION = 1 << 80;
+        const LT_SUBSECTION_FALSE = 1 << 81;
+        const LT_SCHEDULE = 1 << 82;
+        const LT_SCHEDULE_FALSE = 1 << 83;
+        const LT_TITLE = 1 << 84;
+        const LT_TITLE_FALSE = 1 << 85;
+        const LT_UNPUBLISHED = 1 << 86;
+        const LT_UNPUBLISHED_FALSE = 1 << 87;
 
         // No disambiguate, because you can't use this to do any more disambiguation, so unhelpful.
     }
 }
 
+const LT_SHIFT: u32 = 18;
+const FC_MASK_TRUE: FreeCond = FreeCond::from_bits_truncate(u128::MAX / 3);
+const FC_MASK_FALSE: FreeCond = FreeCond::from_bits_truncate(u128::MAX / 3 * 2);
 #[allow(dead_code)]
-const LT_MASK: FreeCond = FreeCond::from_bits_truncate(std::u64::MAX << 16);
-const LT_MASK_TRUE: FreeCond = FreeCond::from_bits_truncate(0x5555_5555_5555_5555 << 16);
-const LT_MASK_FALSE: FreeCond = FreeCond::from_bits_truncate(0xAAAA_AAAA_AAAA_AAAA << 16);
+const LT_MASK: FreeCond = FreeCond::from_bits_truncate(u128::MAX << LT_SHIFT);
+const LT_MASK_TRUE: FreeCond = FreeCond::from_bits_truncate((u128::MAX / 3) << LT_SHIFT);
+const LT_MASK_FALSE: FreeCond = FreeCond::from_bits_truncate((u128::MAX / 3 * 2) << LT_SHIFT);
 
-const FC_MASK_TRUE: FreeCond = FreeCond::from_bits_truncate(0x5555_5555_5555_5555);
-const FC_MASK_FALSE: FreeCond = FreeCond::from_bits_truncate(0xAAAA_AAAA_AAAA_AAAA);
+/// Page comes first so that a run which only rules out some locator types picks the most common
+/// type that is left.
+const LOCATOR_FLAGS: [(LocatorType, FreeCond); 35] = [
+    (LocatorType::Page, FreeCond::LT_PAGE),
+    (LocatorType::Book, FreeCond::LT_BOOK),
+    (LocatorType::Chapter, FreeCond::LT_CHAPTER),
+    (LocatorType::Column, FreeCond::LT_COLUMN),
+    (LocatorType::Figure, FreeCond::LT_FIGURE),
+    (LocatorType::Folio, FreeCond::LT_FOLIO),
+    (LocatorType::Issue, FreeCond::LT_ISSUE),
+    (LocatorType::Line, FreeCond::LT_LINE),
+    (LocatorType::Note, FreeCond::LT_NOTE),
+    (LocatorType::Opus, FreeCond::LT_OPUS),
+    (LocatorType::Paragraph, FreeCond::LT_PARAGRAPH),
+    (LocatorType::Part, FreeCond::LT_PART),
+    (LocatorType::Section, FreeCond::LT_SECTION),
+    (LocatorType::SubVerbo, FreeCond::LT_SUBVERBO),
+    (LocatorType::Verse, FreeCond::LT_VERSE),
+    (LocatorType::Volume, FreeCond::LT_VOLUME),
+    (LocatorType::Act, FreeCond::LT_ACT),
+    (LocatorType::Appendix, FreeCond::LT_APPENDIX),
+    (LocatorType::ArticleLocator, FreeCond::LT_ARTICLE_LOCATOR),
+    (LocatorType::Canon, FreeCond::LT_CANON),
+    (LocatorType::Elocation, FreeCond::LT_ELOCATION),
+    (LocatorType::Equation, FreeCond::LT_EQUATION),
+    (LocatorType::Scene, FreeCond::LT_SCENE),
+    (LocatorType::Table, FreeCond::LT_TABLE),
+    (LocatorType::Timestamp, FreeCond::LT_TIMESTAMP),
+    (LocatorType::TitleLocator, FreeCond::LT_TITLE_LOCATOR),
+    (LocatorType::Version, FreeCond::LT_VERSION),
+    (LocatorType::Rule, FreeCond::LT_RULE),
+    (LocatorType::Supplement, FreeCond::LT_SUPPLEMENT),
+    (LocatorType::Article, FreeCond::LT_ARTICLE),
+    (LocatorType::Subparagraph, FreeCond::LT_SUBPARAGRAPH),
+    (LocatorType::Subsection, FreeCond::LT_SUBSECTION),
+    (LocatorType::Schedule, FreeCond::LT_SCHEDULE),
+    (LocatorType::Title, FreeCond::LT_TITLE),
+    (LocatorType::Unpublished, FreeCond::LT_UNPUBLISHED),
+];
 
 #[test]
 fn test_lt_mask() {
     assert!(LT_MASK.contains(FreeCond::LT_VOLUME_FALSE));
     assert!(LT_MASK.contains(FreeCond::LT_VOLUME));
     assert!(LT_MASK.contains(FreeCond::LT_BOOK));
+    assert!(LT_MASK.contains(FreeCond::LT_UNPUBLISHED_FALSE));
     assert!(!LT_MASK.contains(FreeCond::LOCATOR));
     assert!(!LT_MASK.contains(FreeCond::LOCATOR_FALSE));
+    assert!(!LT_MASK.intersects(FreeCond::DISAMBIGUATE | FreeCond::DISAMBIGUATE_FALSE));
     assert!(LT_MASK_TRUE.contains(FreeCond::LT_PAGE));
     assert!(LT_MASK_TRUE.contains(FreeCond::LT_VOLUME));
+    assert!(LT_MASK_TRUE.contains(FreeCond::LT_TIMESTAMP));
     assert!(!LT_MASK_TRUE.contains(FreeCond::LT_VOLUME_FALSE));
     assert!(LT_MASK_FALSE.contains(FreeCond::LT_VOLUME_FALSE));
     assert!(LT_MASK_FALSE.contains(FreeCond::LT_PAGE_FALSE));
+    assert!(LT_MASK_FALSE.contains(FreeCond::LT_TABLE_FALSE));
     assert!(!LT_MASK_FALSE.contains(FreeCond::LT_PAGE));
+    assert_eq!(
+        LT_MASK_TRUE.bits().count_ones() as usize,
+        LOCATOR_FLAGS.len()
+    );
+    assert_eq!(LT_MASK_TRUE | LT_MASK_FALSE, LT_MASK);
 
     assert!(FC_MASK_TRUE.contains(FreeCond::LOCATOR));
     assert!(FC_MASK_FALSE.contains(FreeCond::LOCATOR_FALSE));
@@ -125,38 +200,6 @@ fn test_invert() {
     );
 }
 
-macro_rules! match_fc {
-    (@internal match ($pos:expr) { $($c:ident => $lt:path,)+ }) => {
-        $(
-            if ($pos).contains(FreeCond::$c) {
-                return Some($lt);
-            }
-        )*
-    };
-    (@locator_type $pos:expr) => {
-        match_fc! { @internal
-            match ($pos) {
-                LT_BOOK       => LocatorType::Book,
-                LT_CHAPTER    => LocatorType::Chapter,
-                LT_COLUMN     => LocatorType::Chapter,
-                LT_FIGURE     => LocatorType::Figure,
-                LT_FOLIO      => LocatorType::Folio,
-                LT_ISSUE      => LocatorType::Issue,
-                LT_LINE       => LocatorType::Line,
-                LT_NOTE       => LocatorType::Note,
-                LT_OPUS       => LocatorType::Opus,
-                LT_PAGE       => LocatorType::Page,
-                LT_PARAGRAPH  => LocatorType::Paragraph,
-                LT_PART       => LocatorType::Part,
-                LT_SECTION    => LocatorType::Section,
-                LT_SUBVERBO   => LocatorType::SubVerbo,
-                LT_VERSE      => LocatorType::Verse,
-                LT_VOLUME     => LocatorType::Volume,
-            }
-        }
-    };
-}
-
 #[test]
 fn test_free_to_loc_type() {
     let x = FreeCond::LT_PART;
@@ -165,10 +208,26 @@ fn test_free_to_loc_type() {
     assert_eq!(x.to_loc_type(), None);
     let x = FreeCond::LT_PART_FALSE | FreeCond::LT_VERSE;
     assert_eq!(x.to_loc_type(), Some(LocatorType::Verse));
+    let x = FreeCond::LT_COLUMN;
+    assert_eq!(x.to_loc_type(), Some(LocatorType::Column));
+    let x = FreeCond::LT_TIMESTAMP;
+    assert_eq!(x.to_loc_type(), Some(LocatorType::Timestamp));
+    let x = FreeCond::LOCATOR | FreeCond::LT_PAGE_FALSE;
+    assert_eq!(x.to_loc_type(), Some(LocatorType::Book));
     let x = FreeCond::LOCATOR;
     assert_eq!(x.to_loc_type(), Some(LocatorType::Page));
     let x = FreeCond::IBID | FreeCond::IBID_WITH_LOCATOR_FALSE;
     assert_eq!(x.to_loc_type(), None);
+}
+
+#[test]
+fn test_every_locator_type_has_flags() {
+    for &(lt, flag) in LOCATOR_FLAGS.iter() {
+        let (t, f) = cond_to_frees(&Cond::Locator(lt)).unwrap();
+        assert_eq!(t, flag);
+        assert_eq!(f, flag.invert());
+        assert_eq!(flag.to_loc_type(), Some(lt));
+    }
 }
 
 impl FreeCond {
@@ -181,19 +240,17 @@ impl FreeCond {
         {
             return None;
         }
-        match_fc!(@locator_type self);
-        let deductive = self & LT_MASK_FALSE;
-        // Could do this with xor, but can't be bothered
-        if deductive.bits().count_zeros() >= 1 {
-            // At least one possible locator type, but the run doesn't care which as long as its
-            // not one of the ones it didn't want.
-            let opposite = deductive.invert();
-            match_fc!(@locator_type opposite);
-        }
-        if self.contains(FreeCond::LOCATOR) {
-            return Some(LocatorType::Page);
-        }
-        None
+        // Either the run asks for one locator type, or it only rules some out and any of the
+        // others will do.
+        let candidates = if self.intersects(LT_MASK_TRUE) {
+            self & LT_MASK_TRUE
+        } else {
+            LT_MASK_TRUE - (self & LT_MASK_FALSE).invert()
+        };
+        LOCATOR_FLAGS
+            .iter()
+            .find(|(_, flag)| candidates.contains(*flag))
+            .map(|(lt, _)| *lt)
     }
 
     pub fn invert(self) -> Self {
@@ -318,34 +375,10 @@ fn cond_to_frees(c: &Cond) -> Option<(FreeCond, FreeCond)> {
                 _ => return None,
             }
         }
-        Cond::Locator(lt) => match lt {
-            LocatorType::Book => (FreeCond::LT_BOOK, FreeCond::LT_BOOK_FALSE),
-            LocatorType::Chapter => (FreeCond::LT_CHAPTER, FreeCond::LT_CHAPTER_FALSE),
-            LocatorType::Column => (FreeCond::LT_COLUMN, FreeCond::LT_COLUMN_FALSE),
-            LocatorType::Figure => (FreeCond::LT_FIGURE, FreeCond::LT_FIGURE_FALSE),
-            LocatorType::Folio => (FreeCond::LT_FOLIO, FreeCond::LT_FOLIO_FALSE),
-            LocatorType::Issue => (FreeCond::LT_ISSUE, FreeCond::LT_ISSUE_FALSE),
-            LocatorType::Line => (FreeCond::LT_LINE, FreeCond::LT_LINE_FALSE),
-            LocatorType::Note => (FreeCond::LT_NOTE, FreeCond::LT_NOTE_FALSE),
-            LocatorType::Opus => (FreeCond::LT_OPUS, FreeCond::LT_OPUS_FALSE),
-            LocatorType::Page => (FreeCond::LT_PAGE, FreeCond::LT_PAGE_FALSE),
-            LocatorType::Paragraph => (FreeCond::LT_PARAGRAPH, FreeCond::LT_PARAGRAPH_FALSE),
-            LocatorType::Part => (FreeCond::LT_PART, FreeCond::LT_PART_FALSE),
-            LocatorType::Section => (FreeCond::LT_SECTION, FreeCond::LT_SECTION_FALSE),
-            LocatorType::SubVerbo => (FreeCond::LT_SUBVERBO, FreeCond::LT_SUBVERBO_FALSE),
-            LocatorType::Verse => (FreeCond::LT_VERSE, FreeCond::LT_VERSE_FALSE),
-            LocatorType::Volume => (FreeCond::LT_VOLUME, FreeCond::LT_VOLUME_FALSE),
-            _ => unimplemented!("CSL-M locator types")
-
-            // TODO(CSL-M) enable
-            // Article => (FreeCond::LT_LINE, FreeCond::LT_LINE_FALSE),
-            // Subparagraph => (FreeCond::LT_LINE, FreeCond::LT_LINE_FALSE),
-            // Rule => (FreeCond::LT_LINE, FreeCond::LT_LINE_FALSE),
-            // Subsection => (FreeCond::LT_LINE, FreeCond::LT_LINE_FALSE),
-            // Schedule => (FreeCond::LT_LINE, FreeCond::LT_LINE_FALSE),
-            // Title => (FreeCond::LT_LINE, FreeCond::LT_LINE_FALSE),
-            // Supplement => (FreeCond::LT_LINE, FreeCond::LT_LINE_FALSE),
-        },
+        Cond::Locator(lt) => {
+            let (_, flag) = LOCATOR_FLAGS.iter().find(|(t, _)| t == lt)?;
+            (*flag, flag.invert())
+        }
         _ => return None,
     };
     Some(x)

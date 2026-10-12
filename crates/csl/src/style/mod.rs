@@ -521,7 +521,7 @@ pub enum Match {
 impl EnumGetAttribute for Match {}
 impl Default for Match {
     fn default() -> Self {
-        Match::Any
+        Match::All
     }
 }
 

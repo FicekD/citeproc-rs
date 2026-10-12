@@ -1,0 +1,50 @@
+mode: citation
+result: |-
+  End-to-End Object Detection with Transformers
+  A State-of-the-Art Method
+  Out-of-Distribution Detection
+  First-in-First-out Queue
+  Built-in and Add-on Tools
+  On-the-Fly Compilation
+  Learning To-Do Lists
+  The End-To
+input:
+  - id: ITEM-0
+    type: book
+    title: "end-to-end object detection with transformers"
+  - id: ITEM-1
+    type: book
+    title: "a state-of-the-art method"
+  - id: ITEM-2
+    type: book
+    title: "out-of-distribution detection"
+  - id: ITEM-3
+    type: book
+    title: "first-in-first-out queue"
+  - id: ITEM-4
+    type: book
+    title: "built-in and add-on tools"
+  - id: ITEM-5
+    type: book
+    title: "on-the-fly compilation"
+  - id: ITEM-6
+    type: book
+    title: "learning to-do lists"
+  - id: ITEM-7
+    type: book
+    title: "the end-to"
+clusters:
+  - [{ id: ITEM-0 }]
+  - [{ id: ITEM-1 }]
+  - [{ id: ITEM-2 }]
+  - [{ id: ITEM-3 }]
+  - [{ id: ITEM-4 }]
+  - [{ id: ITEM-5 }]
+  - [{ id: ITEM-6 }]
+  - [{ id: ITEM-7 }]
+csl: |
+  <?xml version="1.0" encoding="utf-8"?>
+  <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="en-US">
+    <info><id>https://cormacrelf.net/citeproc-rs/test-style</id><title>test-style</title></info>
+    <citation><layout><text variable="title" text-case="title"/></layout></citation>
+  </style>

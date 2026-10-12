@@ -1,0 +1,31 @@
+mode: bibliography
+format: plain
+result: |-
+  <div class="csl-bib-body">
+  [1] LeCun, Deep learning
+  [2] Bishop, Pattern recognition
+  </div>
+input:
+  - id: ITEM-1
+    type: article-journal
+    title: Deep learning
+    author: [{ family: LeCun, given: Yann }]
+  - id: ITEM-2
+    type: book
+    title: Pattern recognition
+    author: [{ family: Bishop, given: Christopher }]
+csl: |
+  <?xml version="1.0" encoding="utf-8"?>
+  <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="en-US">
+    <info><id>https://cormacrelf.net/citeproc-rs/test-style</id><title>test-style</title></info>
+    <citation>
+      <layout><text variable="citation-number" /></layout>
+    </citation>
+    <bibliography second-field-align="flush">
+      <layout>
+        <text variable="citation-number" prefix="[" suffix="]" />
+        <names variable="author" suffix=", "><name form="short" /></names>
+        <text variable="title" />
+      </layout>
+    </bibliography>
+  </style>

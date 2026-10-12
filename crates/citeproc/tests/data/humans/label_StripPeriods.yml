@@ -1,0 +1,34 @@
+mode: bibliography
+result: |-
+  <div class="csl-bib-body">
+    <div class="csl-entry">pp 213–229; p. 213–229; vol 3</div>
+  </div>
+input:
+  - id: ITEM-1
+    type: article-journal
+    page: 213-229
+    volume: 3
+csl: |
+  <?xml version="1.0" encoding="utf-8"?>
+  <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="en-US">
+    <info><id>https://cormacrelf.net/citeproc-rs/test-style</id><title>test-style</title></info>
+    <citation><layout><text variable="title" /></layout></citation>
+    <bibliography>
+      <layout>
+        <group delimiter="; ">
+          <group>
+            <label variable="page" form="short" suffix=" " strip-periods="true" />
+            <text variable="page" />
+          </group>
+          <group>
+            <label variable="page" form="short" plural="never" suffix=" " />
+            <text variable="page" />
+          </group>
+          <group>
+            <label variable="volume" form="short" suffix=" " strip-periods="true" />
+            <text variable="volume" />
+          </group>
+        </group>
+      </layout>
+    </bibliography>
+  </style>

@@ -1183,6 +1183,12 @@ impl FromNode for Names {
                 }
             }
         }
+        // Without a <name>, the names render with default settings and the label follows them.
+        if name.is_none() {
+            if let Some(ref mut label) = label {
+                label.after_name = true;
+            }
+        }
 
         Ok(Names {
             variables: attribute_array_var_lenient(node, "variable", info)?,

@@ -250,12 +250,23 @@ where
 {
     let features = checker.features();
 
-    let mut iter_all = cond_set.conds.iter().filter_map(|cond| {
+    // An item has exactly one type, so like citeproc-js we treat type="a b" as a single test that
+    // passes if any of the types match, whatever the match attribute says.
+    let mut types = cond_set.conds.iter().filter_map(|cond| match cond {
+        Cond::Type(typ) => Some(*typ),
+        _ => None,
+    });
+    let type_test = types.next().map(|first| {
+        let csl_type = checker.csl_type();
+        first == csl_type || types.any(|typ| typ == csl_type)
+    });
+
+    let iter_all = cond_set.conds.iter().filter_map(|cond| {
         Some(match cond {
             Cond::Variable(var) => checker.has_variable(*var),
             Cond::IsNumeric(var) => checker.is_numeric(*var),
             Cond::Disambiguate(d) => *d == checker.is_disambiguate(current_count),
-            Cond::Type(typ) => checker.csl_type() == *typ,
+            Cond::Type(_) => return None,
             // None in a bibliography
             Cond::Position(pos) => checker.position().map_or(false, |p| p.matches(*pos)),
             Cond::Locator(typ) => checker.locator_type() == Some(*typ),
@@ -281,7 +292,7 @@ where
         })
     });
 
-    run_matcher(&mut iter_all, &cond_set.match_type)
+    run_matcher(&mut iter_all.chain(type_test), &cond_set.match_type)
 }
 
 use csl::Features;

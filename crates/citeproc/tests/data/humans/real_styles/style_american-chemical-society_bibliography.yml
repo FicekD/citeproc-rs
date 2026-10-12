@@ -1,0 +1,329 @@
+# Generated from the ResearchAssistant bundled styles; expected output is citeproc-js 2.4.63.
+mode: bibliography
+format-options: {link-anchors: false}
+result: |-
+  <div class="csl-bib-body">
+    <div class="csl-entry">
+      <div class="csl-left-margin">(1)</div><div class="csl-right-inline">LeCun, Y.; Bengio, Y.; Hinton, G. Deep Learning. <i>Nature</i> <b>2015</b>, <i>521</i> (7553), 436–444. https://doi.org/10.1038/nature14539.</div>
+    </div>
+    <div class="csl-entry">
+      <div class="csl-left-margin">(2)</div><div class="csl-right-inline">Carion, N.; Massa, F. End-to-End Object Detection with Transformers. In <i>Computer Vision - ECCV 2020</i>; Vedaldi, A., Bischof, H., Eds.; Lecture Notes in Computer Science; Springer: Cham, 2020; pp 213–229. https://doi.org/10.1007/978-3-030-58452-8_13.</div>
+    </div>
+    <div class="csl-entry">
+      <div class="csl-left-margin">(3)</div><div class="csl-right-inline">He, K.; Zhang, X.; Ren, S.; Sun, J. Deep Residual Learning for Image Recognition. In <i>Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition</i>; IEEE, 2016; pp 770–778.</div>
+    </div>
+    <div class="csl-entry">
+      <div class="csl-left-margin">(4)</div><div class="csl-right-inline">Doe, J. On the Theory of Everything. PhD thesis, Stanford University, Stanford, CA, 2019.</div>
+    </div>
+    <div class="csl-entry">
+      <div class="csl-left-margin">(5)</div><div class="csl-right-inline">Bishop, C. M. <i>Pattern Recognition and Machine Learning</i>, 2nd ed.; Information Science and Statistics; Springer: New York, 2006.</div>
+    </div>
+    <div class="csl-entry">
+      <div class="csl-left-margin">(6)</div><div class="csl-right-inline"><i>The Rust language reference</i>. Rust. https://doc.rust-lang.org/reference/ (accessed 2024-03-01).</div>
+    </div>
+  </div>
+input: [{"id": "lecun2015", "type": "article-journal", "title": "Deep learning", "container-title": "Nature", "volume": "521", "issue": "7553", "page": "436-444", "DOI": "10.1038/nature14539", "author": [{"family": "LeCun", "given": "Yann"}, {"family": "Bengio", "given": "Yoshua"}, {"family": "Hinton", "given": "Geoffrey"}], "issued": {"date-parts": [[2015, 5, 28]]}}, {"id": "carion2020", "type": "chapter", "title": "End-to-end object detection with transformers", "container-title": "Computer Vision - ECCV 2020", "collection-title": "Lecture Notes in Computer Science", "publisher": "Springer", "publisher-place": "Cham", "page": "213-229", "DOI": "10.1007/978-3-030-58452-8_13", "author": [{"family": "Carion", "given": "Nicolas"}, {"family": "Massa", "given": "Francisco"}], "editor": [{"family": "Vedaldi", "given": "Andrea"}, {"family": "Bischof", "given": "Horst"}], "issued": {"date-parts": [[2020]]}}, {"id": "he2016", "type": "paper-conference", "title": "Deep residual learning for image recognition", "container-title": "Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition", "page": "770-778", "publisher": "IEEE", "event-place": "Las Vegas, NV", "author": [{"family": "He", "given": "Kaiming"}, {"family": "Zhang", "given": "Xiangyu"}, {"family": "Ren", "given": "Shaoqing"}, {"family": "Sun", "given": "Jian"}], "issued": {"date-parts": [[2016]]}}, {"id": "doe2019", "type": "thesis", "genre": "PhD thesis", "title": "On the theory of everything", "publisher": "Stanford University", "publisher-place": "Stanford, CA", "author": [{"family": "Doe", "given": "Jane"}], "issued": {"date-parts": [[2019]]}}, {"id": "bishop2006", "type": "book", "title": "Pattern recognition and machine learning", "collection-title": "Information Science and Statistics", "edition": "2", "publisher": "Springer", "publisher-place": "New York", "author": [{"family": "Bishop", "given": "Christopher M."}], "issued": {"date-parts": [[2006]]}}, {"id": "rustref", "type": "webpage", "title": "The Rust language reference", "container-title": "Rust", "URL": "https://doc.rust-lang.org/reference/", "accessed": {"date-parts": [[2024, 3, 1]]}, "issued": {"date-parts": [[2023]]}}]
+csl: |
+  <?xml version="1.0" encoding="utf-8"?>
+  <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" demote-non-dropping-particle="sort-only" page-range-format="expanded" default-locale="en-US">
+    <info>
+      <title>ACS Guide 2022 revision</title>
+      <title-short>American Chemical Society</title-short>
+      <id>http://www.zotero.org/styles/american-chemical-society</id>
+      <link href="http://www.zotero.org/styles/american-chemical-society" rel="self"/>
+      <link href="https://doi.org/10.1021/acsguide.40303" rel="documentation"/>
+      <link href="https://doi.org/10.1021/acsguide" rel="documentation"/>
+      <author>
+        <name>Julian Onions</name>
+        <email>julian.onions@gmail.com</email>
+      </author>
+      <contributor>
+        <name>Ivan Bushmarinov</name>
+        <email>ib@ineos.ac.ru</email>
+      </contributor>
+      <contributor>
+        <name>Sebastian Karcher</name>
+      </contributor>
+      <contributor>
+        <name>Patrick O'Brien</name>
+      </contributor>
+      <category citation-format="numeric"/>
+      <category field="chemistry"/>
+      <summary>The American Chemical Society style</summary>
+      <updated>2022-09-19T18:32:56+00:00</updated>
+      <rights license="http://creativecommons.org/licenses/by-sa/3.0/">This work is licensed under a Creative Commons Attribution-ShareAlike 3.0 License</rights>
+    </info>
+    <locale xml:lang="en">
+      <terms>
+        <term name="editortranslator" form="short">
+          <single>ed. and translator</single>
+          <multiple>eds. and translators</multiple>
+        </term>
+        <term name="translator" form="short">
+          <single>translator</single>
+          <multiple>translators</multiple>
+        </term>
+        <term name="collection-editor" form="short">
+          <single>series ed.</single>
+          <multiple>series eds.</multiple>
+        </term>
+      </terms>
+    </locale>
+    <macro name="editor">
+      <group delimiter="; ">
+        <names variable="editor translator" delimiter="; ">
+          <name sort-separator=", " initialize-with=". " name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
+          <label form="short" prefix=", " text-case="title"/>
+        </names>
+        <names variable="collection-editor">
+          <name sort-separator=", " initialize-with=". " name-as-sort-order="all" delimiter=", " delimiter-precedes-last="always"/>
+          <label form="short" prefix=", " text-case="title"/>
+        </names>
+      </group>
+    </macro>
+    <macro name="author">
+      <names variable="author" suffix=".">
+        <name sort-separator=", " initialize-with=". " name-as-sort-order="all" delimiter="; " delimiter-precedes-last="always"/>
+        <label form="short" prefix=", " text-case="capitalize-first"/>
+      </names>
+    </macro>
+    <macro name="publisher">
+      <choose>
+        <if type="thesis" match="any">
+          <group delimiter=", ">
+            <text variable="publisher"/>
+            <text variable="publisher-place"/>
+          </group>
+        </if>
+        <else>
+          <group delimiter=": ">
+            <text variable="publisher"/>
+            <text variable="publisher-place"/>
+          </group>
+        </else>
+      </choose>
+    </macro>
+    <macro name="title">
+      <choose>
+        <if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+          <text variable="title" text-case="title" font-style="italic"/>
+        </if>
+        <else>
+          <text variable="title" text-case="title"/>
+        </else>
+      </choose>
+    </macro>
+    <macro name="volume">
+      <group delimiter=" ">
+        <text term="volume" form="short" text-case="capitalize-first"/>
+        <text variable="volume"/>
+      </group>
+    </macro>
+    <macro name="series">
+      <text variable="collection-title"/>
+    </macro>
+    <macro name="pages">
+      <label variable="page" form="short" suffix=" " strip-periods="true"/>
+      <text variable="page"/>
+    </macro>
+    <macro name="book-container">
+      <group delimiter=". ">
+        <text macro="title"/>
+        <choose>
+          <if type="entry-dictionary entry-encyclopedia" match="none">
+            <group delimiter=" ">
+              <text term="in" text-case="capitalize-first"/>
+              <text variable="container-title" font-style="italic"/>
+            </group>
+          </if>
+          <else>
+            <text variable="container-title" font-style="italic"/>
+          </else>
+        </choose>
+      </group>
+    </macro>
+    <macro name="issued">
+      <date variable="issued" delimiter=" ">
+        <date-part name="year"/>
+      </date>
+    </macro>
+    <macro name="full-issued">
+      <date variable="issued" delimiter=" ">
+        <date-part name="month" form="long" suffix=" "/>
+        <date-part name="day" suffix=", "/>
+        <date-part name="year"/>
+      </date>
+    </macro>
+    <macro name="edition">
+      <choose>
+        <if is-numeric="edition">
+          <group delimiter=" ">
+            <number variable="edition" form="ordinal"/>
+            <text term="edition" form="short"/>
+          </group>
+        </if>
+        <else>
+          <text variable="edition" suffix="."/>
+        </else>
+      </choose>
+    </macro>
+    <macro name="access">
+      <choose>
+        <if variable="DOI" match="any">
+          <text variable="DOI" prefix="https://doi.org/"/>
+        </if>
+        <else-if type="article-journal book chapter entry-encyclopedia entry-dictionary paper-conference" match="none">
+          <choose>
+            <if variable="URL">
+              <group delimiter=" ">
+                <text variable="URL"/>
+                <group delimiter=" " prefix="(" suffix=")">
+                  <text term="accessed"/>
+                  <date variable="accessed">
+                    <date-part name="year"/>
+                    <date-part name="month" prefix="-" form="numeric-leading-zeros"/>
+                    <date-part name="day" prefix="-" form="numeric-leading-zeros"/>
+                  </date>
+                </group>
+              </group>
+            </if>
+          </choose>
+        </else-if>
+      </choose>
+    </macro>
+    <citation collapse="citation-number">
+      <sort>
+        <key variable="citation-number"/>
+      </sort>
+      <layout delimiter="," vertical-align="sup">
+        <text variable="citation-number"/>
+      </layout>
+    </citation>
+    <bibliography second-field-align="flush" entry-spacing="0">
+      <layout suffix=".">
+        <text variable="citation-number" prefix="(" suffix=")"/>
+        <text macro="author" suffix=" "/>
+        <choose>
+          <if type="article-journal review" match="any">
+            <group delimiter=" ">
+              <text macro="title" suffix="."/>
+              <text variable="container-title" font-style="italic" form="short"/>
+              <group delimiter=", ">
+                <text macro="issued" font-weight="bold"/>
+                <choose>
+                  <if variable="volume">
+                    <group delimiter=" ">
+                      <text variable="volume" font-style="italic"/>
+                      <text variable="issue" prefix="(" suffix=")"/>
+                    </group>
+                  </if>
+                  <else>
+                    <group delimiter=" ">
+                      <text term="issue" form="short" text-case="capitalize-first"/>
+                      <text variable="issue"/>
+                    </group>
+                  </else>
+                </choose>
+                <text variable="page"/>
+              </group>
+            </group>
+          </if>
+          <else-if type="article-magazine article-newspaper article" match="any">
+            <group delimiter=" ">
+              <text macro="title" suffix="."/>
+              <text variable="container-title" font-style="italic" suffix="."/>
+              <text macro="edition"/>
+              <text macro="publisher"/>
+              <group delimiter=", ">
+                <text macro="full-issued"/>
+                <text macro="pages"/>
+              </group>
+            </group>
+          </else-if>
+          <else-if type="thesis">
+            <group delimiter=", ">
+              <group delimiter=". ">
+                <text macro="title"/>
+                <text variable="genre"/>
+              </group>
+              <text macro="publisher"/>
+              <text macro="issued"/>
+              <text macro="volume"/>
+              <text macro="pages"/>
+            </group>
+          </else-if>
+          <else-if type="bill book graphic legal_case legislation motion_picture report song" match="any">
+            <group delimiter="; ">
+              <group delimiter=", ">
+                <text macro="title"/>
+                <text macro="edition"/>
+              </group>
+              <text macro="editor" prefix=" "/>
+              <text macro="series"/>
+              <choose>
+                <if type="report">
+                  <group delimiter=" ">
+                    <text variable="genre"/>
+                    <text variable="number"/>
+                  </group>
+                </if>
+              </choose>
+              <group delimiter=", ">
+                <text macro="publisher"/>
+                <text macro="issued"/>
+              </group>
+              <group delimiter=", ">
+                <text macro="volume"/>
+                <text macro="pages"/>
+              </group>
+            </group>
+          </else-if>
+          <else-if type="patent">
+            <group delimiter=", ">
+              <group delimiter=". ">
+                <text macro="title"/>
+                <text variable="number"/>
+              </group>
+              <date variable="issued" form="text"/>
+            </group>
+          </else-if>
+          <else-if type="chapter paper-conference entry-dictionary entry-encyclopedia" match="any">
+            <group delimiter="; ">
+              <text macro="book-container"/>
+              <text macro="editor"/>
+              <text macro="series"/>
+              <group delimiter=", ">
+                <text macro="publisher"/>
+                <text macro="issued"/>
+              </group>
+              <group delimiter=", ">
+                <text macro="volume"/>
+                <text macro="pages"/>
+              </group>
+            </group>
+          </else-if>
+          <else-if type="webpage post post-weblog" match="any">
+            <group delimiter=". ">
+              <text variable="title" font-style="italic"/>
+              <text variable="container-title"/>
+            </group>
+          </else-if>
+          <else>
+            <group delimiter=", ">
+              <group delimiter=". ">
+                <text macro="title"/>
+                <text variable="container-title" font-style="italic"/>
+              </group>
+              <group delimiter=", ">
+                <text macro="issued"/>
+                <text variable="volume" font-style="italic"/>
+                <text variable="page"/>
+              </group>
+            </group>
+          </else>
+        </choose>
+        <text macro="access" prefix=". "/>
+      </layout>
+    </bibliography>
+  </style>
+  

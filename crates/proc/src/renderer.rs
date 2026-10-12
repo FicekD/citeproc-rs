@@ -420,6 +420,7 @@ impl<'c, O: OutputFormat, I: OutputFormat> Renderer<'c, O, I> {
         selector.and_then(|sel| {
             let options = IngestOptions {
                 text_case: label.text_case,
+                strip_periods: label.strip_periods,
                 quotes: self.quotes(),
                 is_english: self.ctx.is_english(),
                 ..Default::default()

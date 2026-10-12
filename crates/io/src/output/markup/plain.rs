@@ -9,7 +9,7 @@ use crate::output::markup::Link;
 use crate::output::micro_html::MicroNode;
 use crate::output::FormatCmd;
 use crate::String;
-use csl::Formatting;
+use csl::{DisplayMode, Formatting};
 
 #[derive(Debug)]
 pub struct PlainWriter<'a> {
@@ -83,8 +83,20 @@ impl<'a> MarkupWriter for PlainWriter<'a> {
             Text(text) => {
                 self.write_escaped(text.trim_start_if(trim_start));
             }
+            // Matches citeproc-js's text format: the left margin is separated from the rest of
+            // the entry by a space, and blocks start on a new line.
             Div(display, inlines) => {
+                match display {
+                    DisplayMode::Block if !self.dest.is_empty() => self.dest.push('\n'),
+                    DisplayMode::Indent if !self.dest.is_empty() => self.dest.push_str("\n    "),
+                    _ => {}
+                }
                 self.stack_formats(inlines, Formatting::default(), Some(*display));
+                if *display == DisplayMode::LeftMargin {
+                    let trimmed = self.dest.trim_end_matches(' ').len();
+                    self.dest.truncate(trimmed);
+                    self.dest.push(' ');
+                }
             }
             Micro(micros) => {
                 self.write_micros(micros, trim_start);
