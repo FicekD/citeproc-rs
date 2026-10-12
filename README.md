@@ -29,23 +29,42 @@ Not ported (excluded from the default build):
 
 ```sh
 # one-time setup for the test suite
-git submodule update --init           # pulls the CSL test-suite fixtures
+git submodule update --init           # the CSL test-suite and citeproc-js fixtures
 cargo pull-locales                    # clones the CSL locales into the OS cache dir
 
 # build the native library + FFI crates
 cargo build
 
-# run everything: unit tests + the full CSL test suite (now on stable)
+# run everything: unit tests and the fixture suites
 cargo test
 ```
 
-The CSL test suite is wired through [`datatest-stable`] (replacing the upstream nightly-only `datatest` harness), so `#![feature(custom_test_frameworks)]` is gone. Known-failing cases are tracked in `crates/citeproc/tests/data/ignore.txt`.
+### Fixture suites
 
-[`datatest-stable`]: https://crates.io/crates/datatest-stable
+`crates/citeproc/tests/suite.rs` runs about 1,600 fixtures through a [`libtest-mimic`] harness, in roughly 12 seconds:
+
+* the official [CSL test-suite] (`tests/data/test-suite`, a submodule tracking upstream), which is processor independent and is the closest thing CSL has to a conformance suite;
+* citeproc-js's own fixtures (`tests/data/citeproc-js`, a shallow submodule). Together with the CSL test-suite these make up the 1,500 or so tests citeproc-js reports;
+* citeproc-rs's own YAML fixtures in `tests/data/humans`, including citations and bibliographies for eight real styles whose expected output came from citeproc-js, and the text fixtures in `tests/data/fixtures-local`.
+
+Fixtures that need something citeproc-rs does not implement (CSL-M styles, abbreviation lists, multilingual settings, citeproc-js engine options, bibliography sections) are detected from their content and reported as ignored. Known failures are listed with reasons in `tests/data/expected-failures/` and are also reported as ignored. Fixtures where citeproc-rs deliberately differs from citeproc-js, mostly where it follows the specification more closely, are listed in `tests/data/snapshot.txt` and compared against insta snapshots of citeproc-rs's own output, so they still catch regressions.
+
+```sh
+# only the ignored fixtures; any that pass can be removed from the lists
+cargo test -p citeproc --test suite -- --ignored
+
+# one fixture, by part of its name
+cargo test -p citeproc --test suite -- name_ParsedDroppingParticleWithApostrophe
+```
+
+To check what citeproc-js renders for a YAML fixture, `citeproc-js-runner` (or any small Node script using the `citeproc` package) is the quickest way to get an expected result.
+
+[`libtest-mimic`]: https://crates.io/crates/libtest-mimic
+[CSL test-suite]: https://github.com/citation-style-language/test-suite
 
 ## What changed in the port
 
-* Migrated the test harness from the nightly `datatest` fork to stable `datatest-stable`.
+* Replaced the nightly `datatest` test harness with a stable one.
 * Replaced unsound/abandoned dependencies: `smartstring` 0.2 → 1.0 (the 0.2 line is UB on modern rustc), bumped `tendril`, `nom` 6 → 7, and the `html5ever`/`markup5ever_rcdom` stack.
 * Made locale parsing forward-compatible: unknown CSL locale term names are now skipped with a warning instead of failing the whole locale.
 * Gated `jemalloc` to non-MSVC targets; made `dlmalloc` an opt-in test feature.

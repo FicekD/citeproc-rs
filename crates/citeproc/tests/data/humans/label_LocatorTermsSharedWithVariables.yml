@@ -1,0 +1,24 @@
+mode: citation
+result: |-
+  pt. 2
+  sec. 3
+  v. 4
+input:
+  - id: ITEM-1
+    type: book
+    title: A
+clusters:
+  - [{ id: ITEM-1, locator: "2", label: part }]
+  - [{ id: ITEM-1, locator: "3", label: section }]
+  - [{ id: ITEM-1, locator: "4", label: version }]
+csl: |
+  <?xml version="1.0" encoding="utf-8"?>
+  <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0.2" default-locale="en-US">
+    <info><id>https://cormacrelf.net/citeproc-rs/test-style</id><title>test-style</title></info>
+    <citation>
+      <layout>
+        <label variable="locator" form="short" suffix=" " />
+        <text variable="locator" />
+      </layout>
+    </citation>
+  </style>

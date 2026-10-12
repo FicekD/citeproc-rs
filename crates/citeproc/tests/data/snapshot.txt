@@ -72,3 +72,42 @@ discretionary_AuthorOnly.txt
 
 # citeproc-rs does better, the duplicate doi url prefix is avoided
 textcase_RepeatedTitleBug.txt
+
+# citeproc-rs follows the specification for the delimiters around grouped and
+# collapsed cites: year-suffix-delimiter and after-collapse-delimiter default to
+# the layout delimiter, and cite-group-delimiter defaults to ", ". These fixtures
+# encode citeproc-js's behaviour. See commit a970937 in cormacrelf/test-suite.
+collapse_ChicagoAfterCollapse.txt
+collapse_YearSuffixCollapseNoYearSuffixDelimiter.txt
+collapse_YearSuffixImplicitCollapseNoYearSuffixDelimiter.txt
+date_YearSuffixDelimiter.txt
+disambiguate_InitializeWithButNoDisambiguation.txt
+disambiguate_YearCollapseWithInstitution.txt
+disambiguate_YearSuffixWithEtAlSubsequent.txt
+name_CiteGroupDelimiterWithYearSuffixCollapse.txt
+name_CiteGroupDelimiterWithYearSuffixCollapse2.txt
+name_CiteGroupDelimiterWithYearSuffixCollapse3.txt
+
+# Without a cs:sort, cites keep the order they were cited in. citeproc-js sorts
+# them into bibliography order.
+bugreports_ChicagoAuthorDateLooping.txt
+
+# citeproc-rs puts a space after a cite suffix that ends in punctuation.
+bugreports_MissingItemInJoin.txt
+
+# The expected output uses the invalid CSS "vertical-alignment:baseline".
+decorations_Baseline.txt
+
+# The fixture lists ITEM-4 twice, and citeproc-rs renders both.
+number_PlainHyphenOrEnDashAlwaysPlural.txt
+
+# citeproc-rs gives the two Brooker 2011 entries year suffixes, which
+# citeproc-js does not.
+sort_SubstituteTitle.txt
+
+# Sentence case leaves the case of every word after the first alone, as the
+# specification says.
+textcase_SentenceCapitalization.txt
+
+# citeproc-rs keeps disambiguating the subsequent cites by adding titles.
+bugreports_EnvAndUrb.txt

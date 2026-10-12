@@ -14,10 +14,10 @@ use std::sync::Arc;
 impl<O: OutputFormat> IrTree<O> {
     pub fn capitalize_first_term_of_cluster(&mut self, fmt: &O) {
         if let Some(node) = self.tree_ref().find_term_rendered_first() {
+            // Like citeproc-js, a <label> at the start stays as it is; only <text term> is
+            // capitalized.
             let trf = match self.arena.get_mut(node).unwrap().get_mut().0 {
-                IR::Rendered(Some(CiteEdgeData::Term(ref mut b)))
-                | IR::Rendered(Some(CiteEdgeData::LocatorLabel(ref mut b)))
-                | IR::Rendered(Some(CiteEdgeData::FrnnLabel(ref mut b))) => b,
+                IR::Rendered(Some(CiteEdgeData::Term(ref mut b))) => b,
                 _ => return,
             };
             fmt.apply_text_case(
@@ -157,10 +157,16 @@ impl<'a, O: OutputFormat> IrTreeRef<'a, O> {
         }
     }
 
+    /// The first rendered names block. When the names were substituted by something that is not
+    /// a name, like a title, that substitute stands in for the names.
     pub fn first_names_block(&self) -> Option<NodeId> {
         match self.get_node()?.get().0 {
             IR::Name(_) => Some(self.node),
-            IR::ConditionalDisamb(_) | IR::Seq(_) | IR::Substitute => {
+            IR::Substitute => self
+                .children()
+                .find_map(|child| child.first_names_block())
+                .or(Some(self.node)),
+            IR::ConditionalDisamb(_) | IR::Seq(_) => {
                 // assumes it's the first one that appears
                 self.children().find_map(|child| child.first_names_block())
             }
@@ -650,6 +656,32 @@ impl<O: OutputFormat> IR<O> {
             _ => panic!("Called unwrap_cond_disamb_mut on a {:?}", self),
         }
     }
+}
+
+/// Subsequent-author-substitute for names blocks that were substituted by something other than
+/// names. These are replaced as a whole when they render the same as the previous entry's.
+pub fn subsequent_substitute_text<O: OutputFormat<Output = SmartString>>(
+    fmt: &O,
+    previous: IrTreeRef<O>,
+    current_id: NodeId,
+    arena: &mut IrArena<O>,
+    sas: &str,
+) -> bool {
+    let render = |tree: IrTreeRef<O>| tree.flatten(fmt, None).map(|b| fmt.output(b, false));
+    let prev = render(previous);
+    if prev.is_none() || prev != render(IrTreeRef::new(current_id, arena)) {
+        return false;
+    }
+    let children: Vec<_> = current_id.children(arena).collect();
+    children.into_iter().for_each(|ch| ch.remove_subtree(arena));
+    if !sas.is_empty() {
+        let sas_ir = arena.new_node((
+            IR::Rendered(Some(CiteEdgeData::Output(fmt.plain(sas)))),
+            GroupVars::Important,
+        ));
+        current_id.append(sas_ir, arena);
+    }
+    true
 }
 
 pub fn subsequent_author_substitute<O: OutputFormat>(

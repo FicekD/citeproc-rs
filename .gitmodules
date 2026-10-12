@@ -1,3 +1,7 @@
 [submodule "crates/citeproc/tests/data/test-suite"]
 	path = crates/citeproc/tests/data/test-suite
-	url = https://github.com/cormacrelf/test-suite
+	url = https://github.com/citation-style-language/test-suite
+[submodule "crates/citeproc/tests/data/citeproc-js"]
+	path = crates/citeproc/tests/data/citeproc-js
+	url = https://github.com/Juris-M/citeproc-js.git
+	shallow = true

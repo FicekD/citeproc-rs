@@ -141,6 +141,25 @@ fn test_file_iter() {
 }
 
 #[test]
+fn test_primary_dialect() {
+    let fr = Lang::Iso(IsoLang::French, None);
+    let fr_fr = Lang::Iso(IsoLang::French, Some(IsoCountry::FR));
+    let ko = Lang::Iso(IsoLang::Other("ko".into()), None);
+    let ko_kr = Lang::Iso(
+        IsoLang::Other("ko".into()),
+        Some(IsoCountry::Other("KR".into())),
+    );
+    assert_eq!(
+        fr.file_iter().collect::<Vec<_>>(),
+        &[fr, fr_fr, Lang::en_us()]
+    );
+    assert_eq!(
+        ko.file_iter().collect::<Vec<_>>(),
+        &[ko, ko_kr, Lang::en_us()]
+    );
+}
+
+#[test]
 fn test_french() {
     let fr_fr = Lang::Iso(IsoLang::French, Some(IsoCountry::FR));
     let fr = Lang::Iso(IsoLang::French, None);
@@ -286,10 +305,77 @@ impl Iterator for FileIter {
             Iso(French, Some(co)) if *co != FR => Some(Iso(French, Some(FR))),
             Iso(Portuguese, Some(co)) if *co != PT => Some(Iso(Portuguese, Some(PT))),
             Iso(Chinese, Some(TW)) => Some(Iso(Chinese, Some(CN))),
+            Iso(lang, None) => Some(match primary_dialect(lang) {
+                Some(country) => Iso(lang.clone(), Some(country)),
+                None => Iso(English, Some(US)),
+            }),
             _ => Some(Iso(English, Some(US))),
         });
         mem::replace(&mut self.current, next)
     }
+}
+
+/// The primary dialects from the CSL locales repository's locales.json, used when a style only
+/// names a language. Dialects with a script subtag are left out because `Lang` cannot hold them.
+const PRIMARY_DIALECTS: &[(&str, &str)] = &[
+    ("af", "ZA"),
+    ("bal", "PK"),
+    ("bg", "BG"),
+    ("brh", "PK"),
+    ("ca", "AD"),
+    ("cs", "CZ"),
+    ("cy", "GB"),
+    ("da", "DK"),
+    ("de", "DE"),
+    ("el", "GR"),
+    ("en", "US"),
+    ("es", "ES"),
+    ("et", "EE"),
+    ("fa", "IR"),
+    ("fi", "FI"),
+    ("fr", "FR"),
+    ("gl", "ES"),
+    ("he", "IL"),
+    ("hi", "IN"),
+    ("hr", "HR"),
+    ("hu", "HU"),
+    ("hy", "AM"),
+    ("id", "ID"),
+    ("is", "IS"),
+    ("it", "IT"),
+    ("ja", "JP"),
+    ("km", "KH"),
+    ("ko", "KR"),
+    ("lij", "IT"),
+    ("lt", "LT"),
+    ("lv", "LV"),
+    ("mn", "MN"),
+    ("ms", "MY"),
+    ("nb", "NO"),
+    ("nl", "NL"),
+    ("nn", "NO"),
+    ("pa", "PK"),
+    ("pl", "PL"),
+    ("pt", "PT"),
+    ("ro", "RO"),
+    ("ru", "RU"),
+    ("sk", "SK"),
+    ("sl", "SI"),
+    ("sv", "SE"),
+    ("th", "TH"),
+    ("tl", "PH"),
+    ("tr", "TR"),
+    ("uk", "UA"),
+    ("vi", "VN"),
+    ("zh", "CN"),
+];
+
+fn primary_dialect(lang: &IsoLang) -> Option<IsoCountry> {
+    let code = lang.short_code();
+    PRIMARY_DIALECTS
+        .iter()
+        .find(|(l, _)| *l == code)
+        .map(|(_, country)| IsoCountry::from_str(country).unwrap())
 }
 
 impl Iterator for InlineIter {
@@ -308,7 +394,9 @@ impl FromStr for Lang {
     type Err = String;
     fn from_str(input: &str) -> Result<Self, Self::Err> {
         if let Ok((remainder, parsed)) = parse_lang(&input) {
-            if remainder.is_empty() {
+            // A private-use extension like citeproc-js's "en-US-x-sort-ja" does not change the
+            // locale itself
+            if remainder.is_empty() || remainder.starts_with("-x-") {
                 Ok(parsed)
             } else {
                 Err("".into())
@@ -402,4 +490,8 @@ fn lang_from_str() {
     assert_eq!(Lang::from_str("de"), Ok(de));
     assert_eq!(Lang::from_str("i-Navajo"), Ok(iana));
     assert_eq!(Lang::from_str("x-Newspeak"), Ok(unofficial));
+    assert_eq!(
+        Lang::from_str("en-US-x-sort-ja-alalc97"),
+        Ok(Lang::Iso(IsoLang::English, Some(IsoCountry::US)))
+    );
 }

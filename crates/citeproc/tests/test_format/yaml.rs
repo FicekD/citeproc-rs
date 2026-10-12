@@ -12,8 +12,22 @@ use citeproc_io::Reference;
 use serde::Deserialize;
 
 pub fn parse_yaml_test(s: &str) -> Result<TestCase, Error> {
-    let yaml_test_case: YamlTestCase = serde_yaml::from_str(s)?;
-    Ok(yaml_test_case.into())
+    let yaml: YamlTestCase = serde_yaml::from_str(s)?;
+    TestCase::new(
+        yaml.mode,
+        yaml.options,
+        yaml.csl,
+        yaml.input,
+        yaml.result,
+        yaml.clusters.map(|cls| {
+            cls.into_iter()
+                .enumerate()
+                .map(|(n, c_item)| c_item.to_note_cluster(n as u32 + 1u32))
+                .collect()
+        }),
+        yaml.process_citation_clusters,
+    )
+    .map_err(Error::msg)
 }
 
 #[derive(Deserialize, Debug, PartialEq)]
@@ -60,23 +74,4 @@ pub struct TestInitOptions {
     // not in InitOptions, only for tests
     #[serde(default = "bool_true")]
     pub normalise: bool,
-}
-
-impl From<YamlTestCase> for TestCase {
-    fn from(yaml: YamlTestCase) -> Self {
-        TestCase::new(
-            yaml.mode,
-            yaml.options,
-            yaml.csl,
-            yaml.input,
-            yaml.result,
-            yaml.clusters.map(|cls| {
-                cls.into_iter()
-                    .enumerate()
-                    .map(|(n, c_item)| c_item.to_note_cluster(n as u32 + 1u32))
-                    .collect()
-            }),
-            yaml.process_citation_clusters,
-        )
-    }
 }

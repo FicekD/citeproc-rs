@@ -1,0 +1,35 @@
+mode: citation
+result: |-
+  second: A
+  else: B
+input:
+  - id: ITEM-1
+    type: book
+    title: A
+  - id: ITEM-2
+    type: report
+    title: B
+clusters:
+  - [{ id: ITEM-1 }]
+  - [{ id: ITEM-2 }]
+csl: |
+  <?xml version="1.0" encoding="utf-8"?>
+  <style xmlns="http://purl.org/net/xbiblio/csl" class="in-text" version="1.0" default-locale="en-US">
+    <info><id>https://cormacrelf.net/citeproc-rs/test-style</id><title>test-style</title></info>
+    <citation>
+      <layout>
+        <choose>
+          <if type="some-future-type">
+            <text value="first: " />
+          </if>
+          <else-if type="book">
+            <text value="second: " />
+          </else-if>
+          <else>
+            <text value="else: " />
+          </else>
+        </choose>
+        <text variable="title" />
+      </layout>
+    </citation>
+  </style>

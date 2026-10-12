@@ -293,6 +293,9 @@ fn title_case_word<'a>(
         if let Some(ret) = upper_word_to_title(word) {
             return (SmartCow::Owned(ret), None);
         }
+    } else if word.chars().any(char::is_uppercase) {
+        // Mixed-case words like "iPad" keep their case
+        return (SmartCow::Borrowed(word), None);
     }
     (
         transform_first_char_of_word(word, |c| c.to_uppercase()),

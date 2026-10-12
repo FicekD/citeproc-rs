@@ -240,6 +240,10 @@ impl GenderedTermSelector {
             Number(NumberVariable::Page, x) => Locator(LocatorType::Page, x),
             Number(NumberVariable::Issue, x) => Locator(LocatorType::Issue, x),
             Number(NumberVariable::Volume, x) => Locator(LocatorType::Volume, x),
+            Number(NumberVariable::Part, x) => Locator(LocatorType::Part, x),
+            Number(NumberVariable::Section, x) => Locator(LocatorType::Section, x),
+            Number(NumberVariable::Version, x) => Locator(LocatorType::Version, x),
+            Number(NumberVariable::Supplement, x) => Locator(LocatorType::Supplement, x),
             g => g,
         }
     }
@@ -285,6 +289,8 @@ pub struct GenderedTerm(pub TermPlurality, pub Gender);
 #[derive(AsRefStr, EnumString, EnumProperty, Debug, Copy, Clone, PartialEq, Eq, Hash)]
 #[strum(serialize_all = "kebab_case")]
 pub enum TermForm {
+    /// Terms without verb forms fall back from verb and verb-short to long, as in citeproc-js
+    #[strum(to_string = "long", serialize = "verb", serialize = "verb-short")]
     Long,
     Short,
     Symbol,

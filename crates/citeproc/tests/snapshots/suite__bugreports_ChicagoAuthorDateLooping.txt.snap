@@ -1,0 +1,5 @@
+---
+source: crates/citeproc/tests/suite.rs
+expression: res
+---
+(Manstein 1982; Anon.; Anon.)

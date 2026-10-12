@@ -16,8 +16,8 @@ use citeproc_io::{
 
 use core::fmt::Write;
 use lazy_static::lazy_static;
-use serde::{Deserialize, Deserializer};
-use std::mem;
+use serde::Deserialize;
+use std::collections::HashMap;
 use std::str::FromStr;
 
 #[derive(Deserialize, Clone, Debug, PartialEq)]
@@ -131,31 +131,10 @@ impl FromStr for Results {
     }
 }
 
-pub enum InstructionMode {
-    Composite,
-    AuthorOnly,
-    SuppressAuthor,
-}
-
-impl<'de> Deserialize<'de> for InstructionMode {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
-        let s = String::deserialize(deserializer)?;
-        Ok(match s.as_str() {
-            "author-only" => InstructionMode::AuthorOnly,
-            "composite" => InstructionMode::Composite,
-            "suppress-author" => InstructionMode::SuppressAuthor,
-            _ => panic!("unrecognized instruction mode"),
-        })
-    }
-}
-
-#[derive(Deserialize, Debug, PartialEq, Clone)]
+#[derive(Deserialize, Debug, PartialEq, Clone, Default)]
 #[serde(rename_all = "camelCase")]
 struct Properties {
-    #[serde(rename = "noteIndex", alias = "note")]
+    #[serde(rename = "noteIndex", alias = "note", default)]
     note_index: u32,
     #[serde(
         flatten,
@@ -172,6 +151,7 @@ pub struct ClusterInstruction {
     cluster_id: SmartString,
     #[serde(rename = "citationItems", alias = "cites", with = "cite_compat_vec")]
     citation_items: Vec<Cite<Markup>>,
+    #[serde(default)]
     properties: Properties,
 }
 
@@ -200,8 +180,6 @@ impl From<Instruction2> for CiteprocJsInstruction {
         }
     }
 }
-
-use std::collections::HashMap;
 
 pub struct JsExecutor<'a> {
     current_note_numbers: HashMap<ClusterId, ClusterNumber>,
@@ -299,194 +277,148 @@ impl JsExecutor<'_> {
     }
 }
 
-enum Chunk {
-    // Required sections
-    Mode(String),
-
-    /// Interpretation depends on which mode you're using
-    ///
-    /// https://github.com/citation-style-language/test-suite#result
-    Result(String),
-
-    /// XML CSL style
-    ///
-    /// https://github.com/citation-style-language/test-suite#csl
-    Csl(String),
-
-    /// JSON Reference[] list
-    ///
-    /// https://github.com/citation-style-language/test-suite#input
-    Input(String),
-
-    // Optional sections
-    /// JSON LIST of LISTS of bibliography entries as item IDs
-    ///
-    /// https://github.com/citation-style-language/test-suite#bibentries
-    BibEntries(String),
-    /// JSON input to bibliography mode for limiting bib output
-    ///
-    /// https://github.com/citation-style-language/test-suite#bibsection
-    BibSection(String),
-    /// JSON list of lists of cites (ie Cluster[].map(cl => cl.cites))
-    ///
-    /// https://github.com/citation-style-language/test-suite#citation-items
-    CitationItems(String),
-    /// JSON list of lists of objects that represent calls to processCitationCluster
-    ///
-    /// https://github.com/citation-style-language/test-suite#citations
-    Citations(String),
-}
-
-// fn format_human_test(test_case: &TestCase) -> String {
-//     let mut out = String::new();
-//     out += ">>===== MODE =====>>";
-//     out += match test_case.mode {
-//         Mode::Citation => "citation",
-//         Mode::Bibliography => "bibliography",
-//     };
-//     out += "<<===== MODE =====<<";
-//     out += ">>===== INPUT =====>>";
-//     // out += &serde_json::to_string_pretty(&test_case.input).unwrap();
-//     out += "<<===== INPUT =====<<";
-//     out
-// }
-
-pub fn parse_human_test(contents: &str, csl_features: Option<csl::Features>) -> TestCase {
+/// Splits a fixture into its `>>===== NAME =====>>` sections. Text between sections is a comment.
+fn sections(contents: &str) -> HashMap<String, String> {
     use regex::Regex;
     lazy_static! {
-        static ref BEGIN: Regex = Regex::new(r">>=+ ([A-Z\-]+) =+>>").unwrap();
+        static ref BEGIN: Regex = Regex::new(r">>=+ ?([A-Z\-]+) ?=+>>").unwrap();
+        static ref END: Regex = Regex::new(r"<<=+ ?([A-Z\-]+) ?=+<<").unwrap();
     }
-    lazy_static! {
-        static ref END: Regex = Regex::new(r"<<=+ ([A-Z\-]+) =+<<").unwrap();
-    }
-    let mut state = None;
-    let mut chunks = vec![];
-    // some of the files use two or four equals signs, most use five.
+    let mut sections = HashMap::new();
+    let mut current: Option<(String, String)> = None;
     for line in contents.lines() {
         if END.is_match(line) {
-            if state.is_some() {
-                let mut chunk = None;
-                mem::swap(&mut state, &mut chunk);
-                chunks.push(chunk.unwrap());
+            if let Some((name, body)) = current.take() {
+                sections.entry(name).or_insert(body);
             }
         } else if let Some(caps) = BEGIN.captures(line) {
-            state = match caps.get(1).unwrap().as_str() {
-                "MODE" => Some(Chunk::Mode(String::new())),
-                "CSL" => Some(Chunk::Csl(String::new())),
-                "INPUT" => Some(Chunk::Input(String::new())),
-                "RESULT" => Some(Chunk::Result(String::new())),
-                "BIBENTRIES" => Some(Chunk::BibEntries(String::new())),
-                "BIBSECTION" => Some(Chunk::BibSection(String::new())),
-                "CITATION-ITEMS" => Some(Chunk::CitationItems(String::new())),
-                "CITATIONS" => Some(Chunk::Citations(String::new())),
-                x => panic!("unrecognized block: {}", x),
+            current = Some((caps[1].to_string(), String::new()));
+        } else if let Some((_, body)) = current.as_mut() {
+            if !body.is_empty() {
+                body.push('\n');
             }
-        } else {
-            if let Some(ref mut state) = state {
-                match state {
-                    Chunk::Mode(ref mut s)
-                    | Chunk::Csl(ref mut s)
-                    | Chunk::Input(ref mut s)
-                    | Chunk::Result(ref mut s)
-                    | Chunk::BibSection(ref mut s)
-                    | Chunk::BibEntries(ref mut s)
-                    | Chunk::CitationItems(ref mut s)
-                    | Chunk::Citations(ref mut s) => {
-                        if !s.is_empty() {
-                            s.push_str("\n");
-                        }
-                        s.push_str(line);
-                    }
-                }
-            }
-            // otherwise, it's a comment
+            body.push_str(line);
         }
     }
+    sections
+}
 
-    let mut mode = None;
-    let mut csl = None;
-    let mut input: Option<Vec<Reference>> = None;
-    let mut result = None;
+/// Sections that only citeproc-js understands. Fixtures using them test processor-specific
+/// behaviour that citeproc-rs does not implement.
+const UNSUPPORTED_SECTIONS: &[(&str, &str)] = &[
+    ("ABBREVIATIONS", "abbreviation lists"),
+    ("LANGPARAMS", "multilingual parameters"),
+    ("MULTIAFFIX", "multilingual affixes"),
+    ("OPTIONS", "citeproc-js engine options"),
+    ("OPTIONZ", "citeproc-js engine options"),
+    ("KEYS", "citeproc-js input key mapping"),
+    ("BIBENTRIES", "bibliography entry selection"),
+    ("BIBSECTION", "bibliography sections"),
+];
 
-    // TODO
-    let mut bib_entries = None;
-    let mut bib_section = None;
-    let mut citation_items = None;
-    let mut process_citation_clusters: Option<Vec<Instruction2>> = None;
+const SUPPORTED_MODES: &[&str] = &[
+    "citation",
+    "bibliography",
+    "bibliography-nosort",
+    "citation-rtf",
+    "bibliography-rtf",
+];
 
-    for chunk in chunks {
-        match chunk {
-            Chunk::Mode(m) => {
-                mode = mode.or_else(|| match m.as_str() {
-                    "citation" => Some((Mode::Citation, SupportedFormat::Html, false)),
-                    "bibliography" => Some((Mode::Bibliography, SupportedFormat::Html, false)),
-                    "bibliography-nosort" => {
-                        Some((Mode::Bibliography, SupportedFormat::Html, true))
-                    }
-                    "citation-rtf" => Some((Mode::Citation, SupportedFormat::Rtf, false)),
-                    "bibliography-rtf" => Some((Mode::Bibliography, SupportedFormat::Rtf, false)),
-                    _ => panic!("unknown mode {}", m),
-                })
-            }
-            Chunk::Csl(s) => csl = csl.or_else(|| Some(s)),
-            Chunk::Input(s) => {
-                input = input.or_else(|| {
-                    Some(
-                        serde_json::from_str(&s)
-                            .expect("could not parse references in INPUT section"),
-                    )
-                })
-            }
-            Chunk::Result(s) => result = result.or_else(|| Some(s)),
-            Chunk::BibEntries(s) => bib_entries = bib_entries.or_else(|| Some(s)),
-            Chunk::BibSection(s) => bib_section = bib_section.or_else(|| Some(s)),
-            Chunk::CitationItems(s) => {
-                citation_items = citation_items.or_else(|| {
-                    Some(serde_json::from_str(&s).expect("could not parse CITATION-ITEMS"))
-                })
-            }
-            Chunk::Citations(s) => {
-                process_citation_clusters = process_citation_clusters
-                    .or_else(|| Some(serde_json::from_str(&s).expect("could not parse CITATIONS")))
-            }
+/// Says why a fixture cannot run against citeproc-rs, if it cannot.
+pub fn unsupported(contents: &str) -> Option<String> {
+    let sections = sections(contents);
+    if let Some((_, why)) = UNSUPPORTED_SECTIONS
+        .iter()
+        .find(|(name, _)| sections.contains_key(*name))
+    {
+        return Some(why.to_string());
+    }
+    if sections
+        .get("CSL")
+        .map_or(false, |csl| csl.contains("mlz1\""))
+    {
+        return Some("CSL-M style".into());
+    }
+    match sections.get("MODE").map(|m| m.trim()) {
+        Some(mode) if !SUPPORTED_MODES.contains(&mode) => Some(format!("{} mode", mode)),
+        _ => None,
+    }
+}
+
+/// Parses a fixture in the CSL test-suite format.
+pub fn parse_human_test(
+    contents: &str,
+    csl_features: Option<csl::Features>,
+) -> Result<TestCase, String> {
+    if let Some(why) = unsupported(contents) {
+        return Err(format!("unsupported: {}", why));
+    }
+    let sections = sections(contents);
+    let section = |name: &str| {
+        sections
+            .get(name)
+            .ok_or_else(|| format!("fixture has no {} section", name))
+    };
+
+    let (mode, format, bibliography_no_sort) = match section("MODE")?.trim() {
+        "citation" => (Mode::Citation, SupportedFormat::Html, false),
+        "bibliography" => (Mode::Bibliography, SupportedFormat::Html, false),
+        "bibliography-nosort" => (Mode::Bibliography, SupportedFormat::Html, true),
+        "citation-rtf" => (Mode::Citation, SupportedFormat::Rtf, false),
+        "bibliography-rtf" => (Mode::Bibliography, SupportedFormat::Rtf, false),
+        other => unreachable!("unsupported mode {}", other),
+    };
+    let mut input: Vec<serde_json::Value> = serde_json::from_str(section("INPUT")?)
+        .map_err(|e| format!("could not parse INPUT: {}", e))?;
+    // A few fixtures have items without an id, which citeproc-js files under "undefined"
+    for (n, item) in input.iter_mut().enumerate() {
+        if let Some(obj) = item.as_object_mut() {
+            obj.entry("id")
+                .or_insert_with(|| format!("undefined-{}", n).into());
         }
     }
+    let input: Vec<Reference> = serde_json::from_value(input.into())
+        .map_err(|e| format!("could not parse INPUT: {}", e))?;
+    let citation_items: Option<Vec<CompatCitationItem>> = sections
+        .get("CITATION-ITEMS")
+        .map(|s| serde_json::from_str(s))
+        .transpose()
+        .map_err(|e| format!("could not parse CITATION-ITEMS: {}", e))?;
+    let citations: Option<Vec<Instruction2>> = sections
+        .get("CITATIONS")
+        .map(|s| serde_json::from_str(s))
+        .transpose()
+        .map_err(|e| format!("could not parse CITATIONS: {}", e))?;
 
     let options = TestInitOptions {
-        format: mode.map(|(_, f, _)| f).unwrap_or(SupportedFormat::Html),
+        format,
         format_options: FormatOptions {
-            // disable these for txt format tests
             link_anchors: false,
         },
         csl_features,
-        bibliography_no_sort: mode.map_or(false, |(_, _, nosort)| nosort),
+        bibliography_no_sort,
         locale_override: None,
         normalise: true,
     };
-
-    let norm_result = result
-        .map(|x| super::normalise_html(&x, &options))
-        .expect("test case without a RESULT section");
+    let result = super::normalise_html(section("RESULT")?, &options);
 
     TestCase::new(
-        mode.map(|(m, _, _)| m).unwrap_or(Mode::Citation),
+        mode,
         options,
-        csl.expect("test case without a CSL section"),
-        input.expect("test case without an INPUT section"),
-        norm_result,
-        citation_items.map(|items: Vec<CompatCitationItem>| {
+        section("CSL")?.clone(),
+        input,
+        result,
+        citation_items.map(|items| {
             items
                 .into_iter()
                 .enumerate()
-                .map(|(n, c_item): (usize, CompatCitationItem)| {
-                    c_item.to_note_cluster(n as u32 + 1u32)
-                })
+                .map(|(n, item)| item.to_note_cluster(n as u32 + 1))
                 .collect()
         }),
-        process_citation_clusters.map(|inst2s| {
+        citations.map(|inst2s| {
             inst2s
                 .into_iter()
-                .map(|x| CiteprocJsInstruction::from(x))
+                .map(CiteprocJsInstruction::from)
                 .collect()
         }),
     )

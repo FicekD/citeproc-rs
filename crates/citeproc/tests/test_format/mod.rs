@@ -102,7 +102,7 @@ impl TestCase {
         result: String,
         clusters: Option<Vec<ClusterStr>>,
         process_citation_clusters: Option<Vec<CiteprocJsInstruction>>,
-    ) -> Self {
+    ) -> Result<Self, String> {
         let mut processor = {
             let fet = Arc::new(Filesystem::project_dirs());
             Processor::new(InitOptions {
@@ -116,7 +116,7 @@ impl TestCase {
                 locale_override: None,
                 ..Default::default()
             })
-            .expect("could not construct processor")
+            .map_err(|e| format!("could not construct processor: {:?}", e))?
         };
         let clusters = clusters.map(|vec| {
             vec.into_iter()
@@ -129,7 +129,7 @@ impl TestCase {
         });
         processor.reset_references(input.clone());
         Warmup::maximum().execute(&mut processor);
-        TestCase {
+        Ok(TestCase {
             mode,
             init,
             csl,
@@ -138,7 +138,7 @@ impl TestCase {
             clusters,
             process_citation_clusters,
             processor,
-        }
+        })
     }
     pub fn execute(&mut self) -> Option<String> {
         let mut res = String::new();

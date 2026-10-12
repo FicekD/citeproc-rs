@@ -80,7 +80,7 @@ once_cell = "1.4.1"
 # the allocation-heavy code at the time of writing.
 # jemallocator = "0.3.2"
 
-datatest-stable = "0.3"
+libtest-mimic = "0.8"
 
 [[test]]
 name = "suite"

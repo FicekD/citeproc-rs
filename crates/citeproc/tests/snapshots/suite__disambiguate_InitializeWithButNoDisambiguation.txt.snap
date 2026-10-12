@@ -1,0 +1,5 @@
+---
+source: crates/citeproc/tests/suite.rs
+expression: res
+---
+(Doe, 1965b, 1965a)

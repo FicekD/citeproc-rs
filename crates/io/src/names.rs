@@ -235,7 +235,7 @@ impl From<PersonNameInput> for PersonName {
                 return pn;
             }
             if let Some((suff, force_comma)) = split_suffix(given) {
-                *suffix = Some(suff);
+                *suffix = Some(replace_apostrophes(suff));
                 *comma_suffix = force_comma;
             }
             *dropping_particle = split_drop_given(given);

@@ -1,0 +1,32 @@
+# Fixtures from the CSL test-suite that citeproc-rs is known to fail. They are
+# reported as ignored; run `cargo test -p citeproc --test suite -- --ignored`
+# to see whether any of them pass now, and remove those from this list.
+#
+# Fixtures whose expected output citeproc-rs deliberately differs from are in
+# ../snapshot.txt instead.
+
+# Relies on forcing "position" on a cite, which citeproc-js allows. In
+# citeproc-rs cite positions are always computed.
+bugreports_DemoPageFullCiteCruftOnSubsequent.txt
+
+# Variables carried in the note field (Zotero's "extra" convention) are parsed
+# by citeproc-js. citeproc-rs leaves that to the caller.
+label_NameLabelThroughSubstitute.txt
+number_LimitOrdinalsToDayOne.txt
+variables_ContainerTitleShort2.txt
+
+# citeproc-js parses a label out of the locator text, as in "p. 3-8".
+number_OrdinalSpacing.txt
+
+# Given names that contain markup are not initialized.
+name_InTextMarkupInitialize.txt
+name_InTextMarkupNormalizeInitials.txt
+
+# In citeproc-js an empty term still ends substitution.
+substitute_SubstituteOnlyOnceTermEmpty.txt
+
+# Case mapping does not depend on the item language (Turkish dotted I).
+textcase_LocaleUnicode.txt
+
+# Author collapsing without a date in a sorted citation.
+collapse_AuthorCollapseNoDateSorted.txt

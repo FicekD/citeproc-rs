@@ -12,7 +12,7 @@ mod cow_str;
 
 use crate::names::Name;
 use serde::de::{self, Deserialize, Deserializer, MapAccess, SeqAccess, Visitor};
-use serde::de::{Error, IgnoredAny};
+use serde::de::{Error, IgnoredAny, IntoDeserializer};
 use std::borrow::Cow;
 use std::fmt;
 use std::str::FromStr;
@@ -27,6 +27,7 @@ use csl::CslType;
 use csl::Features;
 use csl::GetAttribute;
 use csl::Lang;
+use csl::NumberVariable;
 
 use super::date::{Date, DateOrRange};
 use super::reference::Reference;
@@ -218,7 +219,13 @@ impl<'de> Deserialize<'de> for Reference {
                             id = Some(map.next_value()?);
                         }
                         Field::Type => {
-                            csl_type = Some(map.next_value()?);
+                            // An empty type is treated like a missing one
+                            let typ: String = map.next_value()?;
+                            if !typ.is_empty() {
+                                let typ: de::value::StrDeserializer<V::Error> =
+                                    typ.as_str().into_deserializer();
+                                csl_type = Some(WrapType::deserialize(typ)?);
+                            }
                         }
                         Field::Language => {
                             let wrap: WrapLang = map.next_value()?;
@@ -232,7 +239,15 @@ impl<'de> Deserialize<'de> for Reference {
                                     let _: IgnoredAny = map.next_value()?;
                                 }
                                 Ok(AnyVariable::Ordinary(v)) => {
-                                    ordinary.insert(v, map.next_value()?);
+                                    let value: String = map.next_value()?;
+                                    // CSL 1.0.2 lets some text variables, like version and
+                                    // section, also render through <number>
+                                    if let Ok(nv) =
+                                        NumberVariable::get_attr(&var_name, &Features::default())
+                                    {
+                                        number.insert(nv, NumberLike::Str(value.clone()));
+                                    }
+                                    ordinary.insert(v, value);
                                 }
                                 Ok(AnyVariable::Number(v)) => {
                                     number.insert(v, map.next_value()?);

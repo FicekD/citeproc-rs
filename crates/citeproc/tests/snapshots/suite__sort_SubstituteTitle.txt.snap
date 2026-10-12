@@ -1,0 +1,8 @@
+---
+source: crates/citeproc/tests/suite.rs
+expression: res
+---
+<div class="csl-bib-body">
+<div class="csl-entry">Brooker, C. (2011a, July 24). The news coverage of the Norway mass-killings was fact-free conjecture. <i>The Guardian</i>. London. Retrieved from http://www.guardian.co.uk/commentisfree/2011/jul/24/charlie-brooker-norway-mass-killings</div>
+<div class="csl-entry">Brooker, C. (2011b, July 31). Let’s think outside the box here: maybe blue-sky thinking is nonsense. <i>The Guardian</i>. London. Retrieved from http://www.guardian.co.uk/commentisfree/2011/jul/31/blue-sky-thinking</div>
+</div>

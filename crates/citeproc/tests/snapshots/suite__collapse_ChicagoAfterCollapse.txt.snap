@@ -1,0 +1,7 @@
+---
+source: crates/citeproc/tests/suite.rs
+expression: res
+---
+(Whittaker 1967, 1975; Wiens 1989a, 1989b)
+(Wong 1999, 328; 2000, 475; Garcia 1998, 67)
+(Whittaker 1967, Wiens 1989b)

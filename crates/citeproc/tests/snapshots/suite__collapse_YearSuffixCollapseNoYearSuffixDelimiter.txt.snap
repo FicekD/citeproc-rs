@@ -1,0 +1,6 @@
+---
+source: crates/citeproc/tests/suite.rs
+expression: res
+---
+Smith 2000a–e, 2001
+Smith 2000a;c–e, 2001

@@ -1482,23 +1482,32 @@ fn get_bibliography_map(db: &dyn IrDatabase) -> Arc<FnvHashMap<Atom, Arc<MarkupO
                     .as_ref()
                     .map(|x| (x.as_ref(), bib.subsequent_author_substitute_rule))
             });
-            if let (Some(prev_name_block), Some(current_name_block), Some((sas, sas_rule))) = (
-                prev.as_ref()
-                    .and_then(|(first_block, gen)| gen.tree.arena.get(*first_block)),
-                current,
-                sas,
-            ) {
+            if let (Some((prev_block, prev_gen)), Some(current_name_block), Some((sas, sas_rule))) =
+                (prev.as_ref(), current, sas)
+            {
+                let prev_tree = prev_gen.tree.tree_at_node(*prev_block);
                 let mutated = Arc::make_mut(&mut gen0);
-                let did = transforms::subsequent_author_substitute(
-                    &fmt,
-                    // In order to unwrap this here, you must only replace the NameIR node's
-                    // children, not the IR.
-                    prev_name_block.get().0.unwrap_name_ir(),
-                    current_name_block,
-                    &mut mutated.tree.arena,
-                    sas,
-                    sas_rule,
-                );
+                let current_ir = &mutated.tree.arena.get(current_name_block).unwrap().get().0;
+                let did = match (&prev_tree.get_node().unwrap().get().0, current_ir) {
+                    // In order to unwrap the NameIR here, you must only replace the NameIR
+                    // node's children, not the IR.
+                    (IR::Name(prev_nir), IR::Name(_)) => transforms::subsequent_author_substitute(
+                        &fmt,
+                        prev_nir,
+                        current_name_block,
+                        &mut mutated.tree.arena,
+                        sas,
+                        sas_rule,
+                    ),
+                    (IR::Substitute, IR::Substitute) => transforms::subsequent_substitute_text(
+                        &fmt,
+                        prev_tree,
+                        current_name_block,
+                        &mut mutated.tree.arena,
+                        sas,
+                    ),
+                    _ => false,
+                };
                 if did {
                     mutated.tree_mut().recompute_group_vars();
                 }

@@ -933,6 +933,12 @@ pub fn ends_with_full_stop(els: &[InlineElement], top: bool) -> bool {
         Some(l) => l,
         None => return false,
     };
+    // Look past trailing spaces, as in `He said "Please work." `
+    if let InlineElement::Text(txt) = last {
+        if els.len() > 1 && txt.trim().is_empty() {
+            return ends_with_full_stop(&els[..els.len() - 1], top);
+        }
+    }
     let is_only = top && els.len() == 1;
     match last {
         InlineElement::Text(txt) if is_only => {
@@ -956,6 +962,11 @@ pub fn ends_with_full_stop(els: &[InlineElement], top: bool) -> bool {
                     Some(l) => l,
                     None => return false,
                 };
+                if let MicroNode::Text(txt) = mlast {
+                    if micros.len() > 1 && txt.trim().is_empty() {
+                        return micro_ends_fs(&micros[..micros.len() - 1], top);
+                    }
+                }
                 let mis_only = top && micros.len() == 1;
                 match mlast {
                     MicroNode::Text(txt) if mis_only => {

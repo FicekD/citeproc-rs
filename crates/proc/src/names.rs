@@ -1112,7 +1112,29 @@ impl<'a, O: OutputFormat> OneNameVar<'a, O> {
         etal_term: Option<&(SmartString, Option<Formatting>)>,
     ) -> (impl Iterator<Item = NameTokenBuilt<O::Build>> + 'a, u16) {
         let fmt = self.fmt.clone();
-        let name_tokens = self.name_tokens(position, names_slice.len(), is_sort_key, etal_term);
+        let mut name_tokens = self.name_tokens(position, names_slice.len(), is_sort_key, etal_term);
+        // A name without a given name, like an institution, is never inverted, so
+        // after-inverted-name puts no delimiter after it
+        for ix in 1..name_tokens.len().saturating_sub(1) {
+            let precedes = match name_tokens[ix + 1] {
+                NameToken::And => self.name_el.delimiter_precedes_last,
+                NameToken::EtAl(..) => self.name_el.delimiter_precedes_et_al,
+                _ => continue,
+            };
+            let not_inverted = match name_tokens[ix - 1] {
+                NameToken::Name(n) => match &names_slice[n] {
+                    DisambNameRatchet::Literal { .. } => true,
+                    DisambNameRatchet::Person(p) => p.data.value.given.is_none(),
+                },
+                _ => false,
+            };
+            if name_tokens[ix] == NameToken::Delimiter
+                && precedes == Some(DelimiterPrecedes::AfterInvertedName)
+                && not_inverted
+            {
+                name_tokens[ix] = NameToken::Space;
+            }
+        }
 
         let ntb_len = name_tokens.iter().fold(0, |acc, n| match n {
             NameToken::Name(_ratchet) => acc + 1,

@@ -13,7 +13,9 @@ pub fn truncate_prf(prf: PageRangeFormat, first: u32, mut second: u32) -> u32 {
                 truncate_diff(first, second, 1)
             } else if closest_smaller_power_of_10(first) == 1000 {
                 let chopped = truncate_diff(first, second, 2);
-                if closest_smaller_power_of_10(chopped) == 100 {
+                // The 16th edition dropped this rule
+                if prf != PageRangeFormat::Chicago16 && closest_smaller_power_of_10(chopped) == 100
+                {
                     // force 4 digits if 3 are different
                     return truncate_diff(first, second, 4);
                 }
@@ -56,6 +58,9 @@ fn page_range_chicago() {
     assert_eq!(go(2787, 2816), 2816);
     // but if only two digits different, don't
     assert_eq!(go(1486, 1496), 96);
+    // chicago-16 never forces four digits
+    assert_eq!(truncate_prf(PageRangeFormat::Chicago16, 1496, 1504), 504);
+    assert_eq!(truncate_prf(PageRangeFormat::Chicago16, 1486, 1496), 96);
 }
 
 #[test]
@@ -64,10 +69,12 @@ fn test_truncate_diff() {
     assert_eq!(truncate_diff(121, 125, 1), 5);
     assert_eq!(truncate_diff(121, 125, 2), 25);
     assert_eq!(truncate_diff(121, 125, 3), 125);
+    assert_eq!(truncate_diff(22, 22, 1), 22);
 }
 
 fn truncate_diff(a: u32, b: u32, min: u32) -> u32 {
-    if b < a {
+    // Nothing differs in "22-22", so there is nothing to drop
+    if b <= a {
         return b;
     }
     let mut diff_started = false;

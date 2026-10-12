@@ -318,13 +318,28 @@ impl Locale {
                 .fallback()
                 .filter_map(|sel| self.gendered_terms.get(&sel))
                 .next()
-                .map(|r| r.0.get(plural)),
+                .map(|r| r.0.get(plural))
+                .or_else(|| self.misc_term_for_locator(ts.normalise(), plural)),
             Role(ref ts) => ts
                 .fallback()
                 .filter_map(|sel| self.role_terms.get(&sel))
                 .next()
                 .map(|r| r.get(plural)),
         }
+    }
+
+    /// Some locator terms, like "version", are also misc terms, and the locale stores them as
+    /// misc terms.
+    fn misc_term_for_locator(&self, sel: GenderedTermSelector, plural: bool) -> Option<&str> {
+        let GenderedTermSelector::Locator(locator, form) = sel else {
+            return None;
+        };
+        let misc = MiscTerm::from_str(locator.as_ref()).ok()?;
+        let form = TermFormExtended::from_str(form.as_ref()).ok()?;
+        self.get_text_term(
+            TextTermSelector::Simple(SimpleTermSelector::Misc(misc, form)),
+            plural,
+        )
     }
 
     pub fn get_ordinal_term(&self, selector: OrdinalTermSelector) -> Option<&str> {

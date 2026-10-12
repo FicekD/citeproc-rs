@@ -1,0 +1,156 @@
+# Fixtures from citeproc-js's own fixtures/local that citeproc-rs is known to
+# fail. Unlike the CSL test-suite, these test citeproc-js as a product, so most
+# entries are features citeproc-rs does not have rather than bugs. Fixtures that
+# need CSL-M, abbreviation lists, multilingual settings or citeproc-js engine
+# options are skipped automatically and are not listed here.
+#
+# Run `cargo test -p citeproc --test suite -- --ignored` to see whether any of
+# these pass now, and remove those from the list.
+
+# citeproc-js parses labels and ranges out of number and locator values, as in
+# a page field of "ch. 15", and renders numbers through the label it found.
+condition_IsNumericStrictPages.txt
+label_NonNumericLabelAsSingular.txt
+label_NonNumericNumber.txt
+label_NonNumericNumberFallbackToIssue.txt
+label_PageWithEmbeddedLabel.txt
+locator_EnDashes.txt
+number_ConditionalAndLabel.txt
+number_DocketNumberHyphenOK.txt
+number_EditionOrdinalWithMultiple.txt
+number_EditionOrdinalWithMultipleBraced.txt
+number_EditionOrdinalWithMultipleBracedL14.txt
+number_EditionOrdinalWithMultipleL20.txt
+number_EmbeddedOnlyDefaultsToShort.txt
+number_HyphenatedStrings.txt
+number_ParsedLabels.txt
+number_RevNumberChapteroverrideMultipleLongordinal.txt
+number_RevNumberChapteroverrideMultipleOrdinal.txt
+number_RevNumberChapteroverrideMultiplePlain.txt
+number_RevNumberChapteroverrideMultipleRoman.txt
+number_RevNumberChapteroverrideRangeLongordinal.txt
+number_RevNumberChapteroverrideRangeOrdinal.txt
+number_RevNumberChapteroverrideRangePlain.txt
+number_RevNumberChapteroverrideRangeRoman.txt
+number_RevNumberChapteroverrideSingleLongordinal.txt
+number_RevNumberChapteroverrideSingleOrdinal.txt
+number_RevNumberChapteroverrideSinglePlain.txt
+number_RevNumberChapteroverrideSingleRoman.txt
+number_RevNumberPagelabelMultipleLongordinal.txt
+number_RevNumberPagelabelMultipleOrdinal.txt
+number_RevNumberPagelabelMultiplePlain.txt
+number_RevNumberPagelabelMultipleRoman.txt
+number_RevNumberPagelabelRangeLongordinal.txt
+number_RevNumberPagelabelRangeOrdinal.txt
+number_RevNumberPagelabelRangePlain.txt
+number_RevNumberPagelabelRangeRoman.txt
+number_RevNumberPagelabelSingleLongordinal.txt
+number_RevNumberPagelabelSingleOrdinal.txt
+number_RevNumberPagelabelSinglePlain.txt
+number_RevNumberPagelabelSingleRoman.txt
+number_Substring.txt
+sort_NumericVariables.txt
+
+# Variables, names, dates and types carried in the note field (Zotero's
+# "extra" convention). citeproc-rs leaves that to the caller.
+bugreports_IllustratorInExtra.txt
+citeprocjs_ExtraFieldRecognition.txt
+date_CheaterDateRange.txt
+dateparser_CheaterSyntax.txt
+magic_TypeFieldHack.txt
+name_CheaterNames.txt
+
+# citeproc-js's raw date parser, which understands more formats and languages.
+bugreports_TurkishDateCorruption.txt
+bugreports_UnderscoreDateRangeDelimiter.txt
+bugreports_VancouverNestingFail.txt
+bugreports_YearLastBadOutput.txt
+date_DateBCraw.txt
+date_LoneJapaneseMonth.txt
+date_RawParseSimpleDate.txt
+date_RawSeasonRange1.txt
+date_RawSeasonRange2.txt
+date_RawSeasonRange3.txt
+
+# Juris-M parallel citations.
+parallel_Bibliography.txt
+parallel_CrossCitationIbidOnInsert.txt
+parallel_HackedChicago.txt
+parallel_JournalArticleReverse.txt
+parallel_JournalArticleSimple.txt
+parallel_SuppressYearIfSuppressedInFirstCite.txt
+magic_SuppressYearIfMatchesCollectionNumber.txt
+
+# Multilingual and CJK name handling.
+citeprocjs_SecondaryOnShort.txt
+initials_NonByzantineDisambiguated.txt
+initials_NonByzantineSimple.txt
+locale_RescueBadLocales.txt
+multilingual_TextPrimaryExists.txt
+multilingual_TextSecondaryExists.txt
+multilingual_TextSortMacroExists.txt
+multilingual_TextSortVariableExists.txt
+name_ImplicitInstitution.txt
+name_NbspJoinFR.txt
+name_ZwnbspJoinEN.txt
+name_ZwnbspJoinFR.txt
+
+# Relies on forcing "position" or "near-note" on a cite. In citeproc-rs cite
+# positions are always computed.
+nameattr_EtAlSubsequentMinOnCitationInCitation.txt
+nameattr_EtAlSubsequentMinOnStyleInCitation.txt
+nameattr_EtAlSubsequentUseFirstOnCitationInCitation.txt
+nameattr_EtAlSubsequentUseFirstOnStyleInCitation.txt
+position_NearNoteTrue.txt
+
+# citeproc-js's discretionary author-only and ibid handling, which citeproc-rs
+# does differently through its cluster modes and <intext>.
+discretionary_AuthorOnly.txt
+discretionary_FirstReferenceNumberWithIntext.txt
+discretionary_FirstReferenceNumberWithoutIntext.txt
+discretionary_IbidInAuthorDateStyleWithIntext.txt
+discretionary_IbidInAuthorDateStyleWithoutIntext.txt
+discretionary_IbidInNoteStyleWithIntext.txt
+discretionary_IbidInNoteStyleWithoutIntext.txt
+discretionary_SuppressAuthor.txt
+
+# Word-processor affix handling: alternating parentheses and brackets, and the
+# compact prefix and suffix variants.
+affix_CitationAffixes.txt
+affix_FlipflopParens.txt
+affix_FlipflopParensNote.txt
+affix_WithCommasCompactPrefix.txt
+affix_WordProcessorAffixNoSpaceCompactSuffix.txt
+bugreports_MissingItemInJoinCompactSuffix.txt
+
+# Syntax only citeproc-js accepts: CSL-M locator names and version 1.1, a
+# <label> or <number> without a variable, an undefined macro, and the old
+# "article" and "title" locator names.
+bugreports_Comments.txt
+condition_Locators.txt
+condition_LocatorsCslM.txt
+locator_LocatorExtraIbid.txt
+locator_LocatorExtraIbid2.txt
+locator_LocatorExtraIbid3.txt
+number_ExplicitLeafNumber.txt
+
+# Malformed fixtures: empty input, and cites without ids.
+bugreports_EmptyInput.txt
+bugreports_NumericStyleFirstRefMultipleCiteFailure.txt
+
+# Deliberate differences: citeproc-rs keeps cites in cited order without a
+# cs:sort, parses HTML with a real HTML5 parser, and writes a more compact RTF.
+sort_CitationUnsorted.txt
+flipflop_ItalicsSimplePlus.txt
+bugreports_NonBreakingSpaceJoinFail.txt
+
+# Not investigated yet.
+bugreports_lotOfAuthors.txt
+bugreports_mendeleyNameCrash.txt
+decor_BreakingQuotes.txt
+disambiguate_BasedOnSubsequentFormWithLocator.txt
+disambiguate_PreferSingleName.txt
+magic_StripPeriodsOnDottedTitle.txt
+name_EtAlAsSuffixInCitationShort.txt
+sort_WithMacro.txt
+variables_CollectionTitleShort2.txt

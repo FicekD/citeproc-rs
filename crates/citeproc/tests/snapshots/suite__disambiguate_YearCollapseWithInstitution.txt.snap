@@ -1,0 +1,7 @@
+---
+source: crates/citeproc/tests/suite.rs
+expression: res
+---
+(Smith Co 2000a, 2000b, 2000c)
+(Smith Co 2000b)
+(Smith Co 2000c)

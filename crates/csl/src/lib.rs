@@ -891,6 +891,22 @@ fn choose_el(node: &Node, info: &ParseInfo) -> Result<Element, CslError> {
         Err(InvalidCsl::new(el, &format!("Unrecognised element {} in <choose>", tag)).into())
     };
 
+    // A branch that only tests unknown values can never match, but the rest of the <choose>
+    // still works.
+    let branch = |el: &Node| match IfThen::from_node(el, info) {
+        Err(e) if e.0.iter().all(|err| err.severity == Severity::Warning) => {
+            for w in &e.0 {
+                warn!("CSL: branch can never match: {}", w.message);
+            }
+            let never = CondSet {
+                match_type: Match::Any,
+                conds: Default::default(),
+            };
+            Ok(IfThen(Conditions(Match::All, vec![never]), Vec::new()))
+        }
+        other => other,
+    };
+
     for el in node.children().filter(|n| n.is_element()) {
         // TODO: figure out why doing this without a clone causes 'borrowed value does not
         // live long enough' problems.
@@ -899,13 +915,13 @@ fn choose_el(node: &Node, info: &ParseInfo) -> Result<Element, CslError> {
         if !seen_if {
             if tag == "if" {
                 seen_if = true;
-                if_block = Some(IfThen::from_node(&el, info)?);
+                if_block = Some(branch(&el)?);
             } else {
                 return Err(InvalidCsl::new(&el, "<choose> blocks must begin with an <if>").into());
             }
         } else if !seen_else {
             if tag == "else-if" {
-                elseifs.push(IfThen::from_node(&el, info)?);
+                elseifs.push(branch(&el)?);
             } else if tag == "else" {
                 seen_else = true;
                 else_block = Else::from_node(&el, info)?;
@@ -1083,7 +1099,10 @@ impl FromNode for Element {
             Ok(el) => Ok(el),
             Err(ref e) if e.0.iter().all(|err| err.severity == Severity::Warning) => {
                 for w in &e.0 {
-                    warn!("CSL: skipping element with unknown attribute: {}", w.message);
+                    warn!(
+                        "CSL: skipping element with unknown attribute: {}",
+                        w.message
+                    );
                 }
                 Ok(Element::Nop)
             }

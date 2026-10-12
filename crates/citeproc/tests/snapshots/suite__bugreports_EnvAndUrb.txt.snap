@@ -1,0 +1,8 @@
+---
+source: crates/citeproc/tests/suite.rs
+expression: res
+---
+[0] Baines, T S, O Benedettini and J M Kay, ‘Title One’; Baines, T S, F Gump and J M Kay, ‘Title Two’.
+[1] See reference 1, Baines et al., ‘Title One’.
+[2] See reference 1, Baines et al., ‘Title Two’.
+

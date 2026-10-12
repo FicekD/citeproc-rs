@@ -160,6 +160,12 @@ pub trait RenderContext {
             (Variable::ContainerTitle, VariableForm::Short) => get(Variable::ContainerTitleShort)
                 .or_else(|| get(Variable::JournalAbbreviation))
                 .or_else(|| get(Variable::ContainerTitle)),
+            (Variable::CollectionTitle, VariableForm::Short) => {
+                get(Variable::CollectionTitleShort).or_else(|| get(Variable::CollectionTitle))
+            }
+            (Variable::VolumeTitle, VariableForm::Short) => {
+                get(Variable::VolumeTitleShort).or_else(|| get(Variable::VolumeTitle))
+            }
             (Variable::CitationLabel, _) if refr.ordinary.get(&var).is_none() => {
                 let tri = crate::citation_label::Trigraph::default();
                 Some(Cow::Owned(tri.make_label(self.reference())))

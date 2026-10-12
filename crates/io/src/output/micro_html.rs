@@ -54,7 +54,7 @@ pub trait HtmlReader<T> {
         if tag.name == "html" || tag.name == "body" {
             // ignore <html> and <body> tags, but still parse their children
             tag.ignore_self();
-        } else if tag.name == "i" || tag.name == "b" || tag.name == "sup" || tag.name == "sub" {
+        } else if ["i", "b", "sup", "sub", "sc"].contains(&tag.name) {
             // ok
         } else if tag.name == "span" {
             tag.allow_attribute("style");
@@ -95,6 +95,7 @@ impl HtmlReader<String> for PlainHtmlReader {
             "b" => children,
             "sup" => children,
             "sub" => children,
+            "sc" => children,
             "span" => match tag.attrs {
                 // very specific!
                 [("style", "font-variant:small-caps;")]
@@ -124,6 +125,8 @@ impl HtmlReader<MicroNode> for MicroHtmlReader<'_> {
             "b" => MicroNode::Formatted(children, FormatCmd::FontWeightBold),
             "sup" => MicroNode::Formatted(children, FormatCmd::VerticalAlignmentSuperscript),
             "sub" => MicroNode::Formatted(children, FormatCmd::VerticalAlignmentSubscript),
+            // citeproc-js accepts <sc> as a shorthand for small caps
+            "sc" => MicroNode::Formatted(children, FormatCmd::FontVariantSmallCaps),
             "span" => match tag.attrs {
                 // very specific!
                 [("style", "font-variant:small-caps;")]
