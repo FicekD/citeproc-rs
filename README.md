@@ -57,6 +57,8 @@ cargo test -p citeproc --test suite -- --ignored
 cargo test -p citeproc --test suite -- name_ParsedDroppingParticleWithApostrophe
 ```
 
+What is still skipped or failing, and what was left out on purpose, is described in [docs/deferred-work.md](docs/deferred-work.md).
+
 To check what citeproc-js renders for a YAML fixture, `citeproc-js-runner` (or any small Node script using the `citeproc` package) is the quickest way to get an expected result.
 
 [`libtest-mimic`]: https://crates.io/crates/libtest-mimic

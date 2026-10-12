@@ -9,8 +9,8 @@ citation
 (2001)
 (Robert Jones, 2002)
 (2003)
-(2004, [Susan Jenkins tran.])
-(2005, [Vincent Herbert tran.])
+(2004, [Susan Jenkins trans.])
+(2005, [Vincent Herbert trans.])
 <<== RESULT ==<<
 
 >>== CITATION-ITEMS ==>>
