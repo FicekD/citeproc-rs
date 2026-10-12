@@ -265,7 +265,7 @@ impl<'de> Deserialize<'de> for Reference {
                         }
                     }
                 }
-                Ok(Reference {
+                let mut refr = Reference {
                     id: id
                         .map(|i| csl::Atom::from(i.into_string()))
                         .ok_or_else(|| de::Error::missing_field("id"))?,
@@ -275,7 +275,9 @@ impl<'de> Deserialize<'de> for Reference {
                     number,
                     name,
                     date,
-                })
+                };
+                crate::note_fields::apply(&mut refr);
+                Ok(refr)
             }
         }
 
@@ -494,6 +496,9 @@ impl<'de> Deserialize<'de> for MaybeDate {
             where
                 E: de::Error,
             {
+                if let Some(date) = crate::edtf::parse(value) {
+                    return Ok(MaybeDate(Some(date)));
+                }
                 FromStr::from_str(value)
                     .or_else(|_| {
                         Ok(DateOrRange::Literal {
@@ -508,6 +513,9 @@ impl<'de> Deserialize<'de> for MaybeDate {
             where
                 E: de::Error,
             {
+                if let Some(date) = crate::edtf::parse(&value) {
+                    return Ok(MaybeDate(Some(date)));
+                }
                 FromStr::from_str(&value)
                     .or_else(|_| {
                         Ok(DateOrRange::Literal {
@@ -557,9 +565,11 @@ impl<'de> Deserialize<'de> for MaybeDate {
                             }
                         }
                         DateType::Edtf => {
-                            log::warn!("unimplemented: edtf date support");
-                            let _: IgnoredAny = map.next_value()?;
-                            continue;
+                            let v: Cow<'de, str> = map.next_value()?;
+                            match crate::edtf::parse(&v) {
+                                Some(date) => found = Some(date),
+                                None => log::warn!("not an EDTF date: {}", v),
+                            }
                         }
                         DateType::Season => found_season = Some(map.next_value()?),
                         DateType::Circa => {
@@ -631,7 +641,7 @@ impl<'de> Deserialize<'de> for MaybeDate {
             }
         }
 
-        const DATE_TYPES: &[&str] = &["date-parts", "season", "circa", "literal", "raw"];
-        deserializer.deserialize_struct("DateOrRange", DATE_TYPES, DateVisitor)
+        // Any, because a date can also be a plain EDTF string
+        deserializer.deserialize_any(DateVisitor)
     }
 }

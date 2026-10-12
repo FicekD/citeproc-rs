@@ -42,20 +42,10 @@ pub enum ClusterMode {
         /// the first `n` same-author groups. The default value is 1. If this is zero, then all
         /// cites have their authors suppressed.
         ///
-        /// ```ignore
-        /// // imagine @refid is a Cite to a reference with id 'refid'
-        /// let in_text = Cluster {
-        ///     id: 1,
-        ///     cites: vec![Cite::basic("smith")],
-        ///     mode: ClusterMode::AuthorOnly,
-        /// };
-        /// let note_after = Cluster {
-        ///     id: 2,
-        ///     cites: vec![Cite::basic("smith"), Cite::basic("jones")],
-        ///     mode: ClusterMode::SuppressAuthor {
-        ///         suppress_first: 1,
-        ///     },
-        /// };
+        /// ```
+        /// use citeproc_io::ClusterMode;
+        /// // For a note cluster citing @smith and then @jones
+        /// let note_after = ClusterMode::SuppressAuthor { suppress_first: 1 };
         /// ```
         ///
         /// In the note_after cluster, the @smith reference won't have an author, but @jones will.

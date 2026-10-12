@@ -68,6 +68,26 @@ pub enum Name {
     // TODO: represent an institution in CSL-M?
 }
 
+impl Name {
+    /// A name written as "Family || Given", or a literal name without the separator.
+    pub(crate) fn from_note_field(value: &str) -> Option<Self> {
+        let mut parts = value.split("||").map(str::trim);
+        let first = parts.next()?;
+        match (parts.next(), parts.next()) {
+            (None, _) => Some(NameInput::Literal {
+                literal: first.into(),
+            }),
+            (Some(given), None) => Some(NameInput::Person(PersonNameInput {
+                family: Some(first.into()),
+                given: Some(given.into()),
+                ..Default::default()
+            })),
+            _ => None,
+        }
+        .map(Name::from)
+    }
+}
+
 impl From<NameInput> for Name {
     fn from(input: NameInput) -> Self {
         match input {

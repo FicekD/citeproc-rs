@@ -60,22 +60,25 @@ impl<'de> Visitor<'de> for CowStrVisitor {
 /// Deserializes a Cow<str> as Borrowed where possible.
 /// The default impl for Cow does not do this: https://github.com/serde-rs/json/issues/587
 ///
-/// To benefit, you must use `serde_json::from_str` or another deserializer that supports borrowed data.
-///
-/// ## Usage
-///
-/// ```ignore
-/// use std::borrow::Cow;
-/// #[derive(serde_derive::Deserialize)]
-/// struct MyStruct<'a> {
-///     #[serde(borrow, deserialize_with = "deserialize_cow_str")]
-///     field: Cow<'a, str>,
-/// }
-/// ```
+/// To benefit, you must use `serde_json::from_str` or another deserializer that supports borrowed
+/// data, and mark the field with `#[serde(borrow, deserialize_with = "deserialize_cow_str")]`.
 pub fn deserialize_cow_str<'de, D>(deserializer: D) -> Result<Cow<'de, str>, D::Error>
 where
     D: Deserializer<'de>,
 {
     let wrapper = CowStr::deserialize(deserializer)?;
     Ok(wrapper.0)
+}
+
+#[test]
+fn borrows_unless_escaped() {
+    #[derive(serde_derive::Deserialize)]
+    struct MyStruct<'a> {
+        #[serde(borrow, deserialize_with = "deserialize_cow_str")]
+        field: Cow<'a, str>,
+    }
+    let plain: MyStruct = serde_json::from_str(r#"{ "field": "plain" }"#).unwrap();
+    assert!(matches!(plain.field, Cow::Borrowed("plain")));
+    let escaped: MyStruct = serde_json::from_str(r#"{ "field": "a\"b" }"#).unwrap();
+    assert!(matches!(escaped.field, Cow::Owned(ref s) if s == "a\"b"));
 }

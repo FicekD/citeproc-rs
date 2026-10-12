@@ -1751,6 +1751,17 @@ fn cite_positions(db: &dyn IrDatabase) -> Arc<FnvHashMap<CiteId, (Position, Opti
                     map.insert(cite_id, (Position::First, None));
                 }
             }
+            if let Some(forced) = cite.position {
+                let frnn = match (forced, cluster.number) {
+                    (Position::First, _) => None,
+                    (_, ClusterNumber::Note(n)) => map
+                        .get(&cite_id)
+                        .and_then(|x| x.1)
+                        .or(Some(n.note_number())),
+                    _ => None,
+                };
+                map.insert(cite_id, (forced, frnn));
+            }
         }
 
         match cluster.number {

@@ -81,6 +81,16 @@ impl<'a, O: OutputFormat, I: OutputFormat> GenericContext<'a, O, I> {
         cite.map_or(default_is_english, |l| l.is_english())
     }
 
+    pub fn is_turkic(&self) -> bool {
+        let default_is_turkic = self
+            .style()
+            .default_locale
+            .as_ref()
+            .map_or(false, |x| x.is_turkic());
+        self.cite_lang()
+            .map_or(default_is_turkic, |l| l.is_turkic())
+    }
+
     /// For setting display="X" on elements, where this should only take effect in the
     /// bibliography.
     pub fn in_bibliography(&self) -> bool {
@@ -218,6 +228,7 @@ impl<'c, O: OutputFormat, I: OutputFormat> Renderer<'c, O, I> {
             text_case: number.text_case,
             quotes: self.quotes(),
             is_english: self.ctx.is_english(),
+            is_turkic: self.ctx.is_turkic(),
             ..Default::default()
         };
         let b = fmt.ingest(&string, &options);
@@ -275,6 +286,7 @@ impl<'c, O: OutputFormat, I: OutputFormat> Renderer<'c, O, I> {
             quotes: self.quotes(),
             strip_periods: text.strip_periods,
             is_english: self.ctx.is_english(),
+            is_turkic: self.ctx.is_turkic(),
             ..Default::default()
         };
         let hyper = match var {
@@ -293,6 +305,7 @@ impl<'c, O: OutputFormat, I: OutputFormat> Renderer<'c, O, I> {
             quotes: self.quotes(),
             strip_periods: text.strip_periods,
             is_english: self.ctx.is_english(),
+            is_turkic: self.ctx.is_turkic(),
             ..Default::default()
         };
         Some(self.render_text_el(value, text, &options, None))
@@ -314,6 +327,7 @@ impl<'c, O: OutputFormat, I: OutputFormat> Renderer<'c, O, I> {
                     quotes: self.quotes(),
                     strip_periods: text.strip_periods,
                     is_english: self.ctx.is_english(),
+                    is_turkic: self.ctx.is_turkic(),
                     ..Default::default()
                 };
                 self.render_text_el(val, text, &options, None)
@@ -392,6 +406,7 @@ impl<'c, O: OutputFormat, I: OutputFormat> Renderer<'c, O, I> {
                         strip_periods,
                         quotes: self.quotes(),
                         is_english: self.ctx.is_english(),
+                        is_turkic: self.ctx.is_turkic(),
                         ..Default::default()
                     };
                     let b = fmt.ingest(term_text, &options);
@@ -423,6 +438,7 @@ impl<'c, O: OutputFormat, I: OutputFormat> Renderer<'c, O, I> {
                 strip_periods: label.strip_periods,
                 quotes: self.quotes(),
                 is_english: self.ctx.is_english(),
+                is_turkic: self.ctx.is_turkic(),
                 ..Default::default()
             };
             self.ctx

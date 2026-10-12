@@ -272,7 +272,7 @@ pub fn intermediate<'c, O: OutputFormat, I: OutputFormat>(
                         .name_override
                         .replace_name_overrides_for_substitute(names_inheritance.clone());
                     let node = el.intermediate(db, &mut new_state, ctx, arena);
-                    if !IrTree::is_empty(node, arena) {
+                    if is_term(el) || !IrTree::is_empty(node, arena) {
                         new_state.name_override.restore_name_overrides(old);
                         let wrapper = arena.new_node((IR::Substitute, GroupVars::Important));
                         wrapper.append(node, arena);
@@ -350,7 +350,7 @@ pub fn intermediate<'c, O: OutputFormat, I: OutputFormat>(
                     .name_override
                     .replace_name_overrides_for_substitute(names_inheritance.clone());
                 let node = el.intermediate(db, &mut new_state, ctx, arena);
-                if !IrTree::is_empty(node, arena) {
+                if is_term(el) || !IrTree::is_empty(node, arena) {
                     new_state.name_override.restore_name_overrides(old);
                     let wrapper = arena.new_node((IR::Substitute, GroupVars::Important));
                     wrapper.append(node, arena);
@@ -624,6 +624,11 @@ pub fn pn_filtered_parts(pn: &PersonName, order: DisplayOrdering) -> Vec<NamePar
             }
             acc
         })
+}
+
+/// As in citeproc-js, a term in cs:substitute ends substitution even if it is empty.
+fn is_term(el: &Element) -> bool {
+    matches!(el, Element::Text(text) if matches!(text.source, csl::TextSource::Term(..)))
 }
 
 fn pn_filter_part(pn: &PersonName, token: NamePartToken) -> bool {

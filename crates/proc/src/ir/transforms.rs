@@ -233,6 +233,16 @@ impl<'a, O: OutputFormat> IrTreeRef<'a, O> {
         }
     }
 
+    /// Like is_empty, but also true for containers whose children all render nothing.
+    pub fn renders_nothing(&self) -> bool {
+        match self.get_node().map(|x| &x.get().0) {
+            None => false,
+            Some(IR::Rendered(opt)) => opt.is_none(),
+            Some(IR::NameCounter(_)) => false,
+            Some(_) => self.children().all(|child| child.renders_nothing()),
+        }
+    }
+
     pub fn find_year_suffix(&self) -> Option<u32> {
         self.has_explicit_year_suffix()
             .or_else(|| self.has_implicit_year_suffix())

@@ -9,6 +9,7 @@ use crate::NumberLike;
 use crate::String;
 use csl::Atom;
 use csl::LocatorType;
+use csl::Position;
 use serde::de::{Deserialize, Deserializer};
 
 /// Represents one cite in someone's document, to exactly one reference.
@@ -60,6 +61,40 @@ pub struct Cite<O: OutputFormat> {
 
     #[serde(default, flatten)]
     pub mode: Option<CiteMode>,
+
+    /// Overrides the computed position, as citeproc-js allows with `"position": 0..3` and
+    /// `"near-note": true`.
+    #[serde(default, flatten, deserialize_with = "forced_position")]
+    pub position: Option<Position>,
+}
+
+/// Reads citeproc-js's numeric positions: 0 first, 1 subsequent, 2 ibid, 3 ibid-with-locator.
+fn forced_position<'de, D>(d: D) -> Result<Option<Position>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    #[derive(Deserialize)]
+    struct Forced {
+        position: Option<u8>,
+        #[serde(default, rename = "near-note")]
+        near_note: bool,
+    }
+    let Forced {
+        position,
+        near_note,
+    } = Forced::deserialize(d)?;
+    Ok(position.and_then(|p| {
+        Some(match (p, near_note) {
+            (0, _) => Position::First,
+            (1, false) => Position::Subsequent,
+            (1, true) => Position::NearNote,
+            (2, false) => Position::Ibid,
+            (2, true) => Position::IbidNear,
+            (3, false) => Position::IbidWithLocator,
+            (3, true) => Position::IbidWithLocatorNear,
+            _ => return None,
+        })
+    }))
 }
 
 use std::fmt;
@@ -128,6 +163,9 @@ pub struct CiteCompat {
 
     #[serde(default, flatten, deserialize_with = "CiteMode::compat")]
     pub mode: Option<CiteMode>,
+
+    #[serde(default, flatten, deserialize_with = "forced_position")]
+    pub position: Option<Position>,
 }
 
 pub mod cite_compat_vec {
@@ -322,6 +360,7 @@ impl<O: OutputFormat> Cite<O> {
             suffix: Default::default(),
             locators: None,
             mode: None,
+            position: None,
         }
     }
     pub fn has_affix(&self) -> bool {

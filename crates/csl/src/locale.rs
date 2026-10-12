@@ -342,6 +342,17 @@ impl Locale {
         )
     }
 
+    /// The locator type whose short label is written as `label`, like "p." for page.
+    pub fn locator_for_label(&self, label: &str) -> Option<LocatorType> {
+        use strum::IntoEnumIterator;
+        LocatorType::iter().find(|&locator| {
+            [false, true].iter().any(|&plural| {
+                let sel = GenderedTermSelector::Locator(locator, TermForm::Short);
+                self.get_text_term(TextTermSelector::Gendered(sel), plural) == Some(label)
+            })
+        })
+    }
+
     pub fn get_ordinal_term(&self, selector: OrdinalTermSelector) -> Option<&str> {
         let mut found = None;
         for sel in selector.fallback() {

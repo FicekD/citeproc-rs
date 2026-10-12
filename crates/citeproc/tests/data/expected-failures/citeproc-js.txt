@@ -53,9 +53,6 @@ sort_NumericVariables.txt
 
 # Variables, names, dates and types carried in the note field (Zotero's
 # "extra" convention). citeproc-rs leaves that to the caller.
-bugreports_IllustratorInExtra.txt
-citeprocjs_ExtraFieldRecognition.txt
-date_CheaterDateRange.txt
 dateparser_CheaterSyntax.txt
 magic_TypeFieldHack.txt
 name_CheaterNames.txt
@@ -101,7 +98,6 @@ nameattr_EtAlSubsequentMinOnCitationInCitation.txt
 nameattr_EtAlSubsequentMinOnStyleInCitation.txt
 nameattr_EtAlSubsequentUseFirstOnCitationInCitation.txt
 nameattr_EtAlSubsequentUseFirstOnStyleInCitation.txt
-position_NearNoteTrue.txt
 
 # citeproc-js's discretionary author-only and ibid handling, which citeproc-rs
 # does differently through its cluster modes and <intext>.
@@ -153,4 +149,3 @@ disambiguate_PreferSingleName.txt
 magic_StripPeriodsOnDottedTitle.txt
 name_EtAlAsSuffixInCitationShort.txt
 sort_WithMacro.txt
-variables_CollectionTitleShort2.txt

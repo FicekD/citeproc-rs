@@ -26,6 +26,133 @@ pub fn initialize<'n>(
     with: Option<&str>,
     initialize_with_hyphens: bool,
 ) -> Cow<'n, str> {
+    if with.is_some() && given_name.contains('<') {
+        if let Some(marked_up) =
+            initialize_marked_up(given_name, initialize, with, initialize_with_hyphens)
+        {
+            return Cow::Owned(marked_up);
+        }
+    }
+    initialize_plain(given_name, initialize, with, initialize_with_hyphens)
+}
+
+/// A word of a given name, with the tags that open before it and close after it, as in
+/// `<b>John</b>`.
+struct MarkedUpWord<'n> {
+    open: &'n str,
+    text: &'n str,
+    close: &'n str,
+}
+
+/// Splits on spaces and hyphens outside tags, returning the words and the separators between
+/// them.
+fn marked_up_words(s: &str) -> (Vec<MarkedUpWord<'_>>, Vec<char>) {
+    let mut words = Vec::new();
+    let mut separators = Vec::new();
+    let mut in_tag = false;
+    let mut start = 0;
+    for (ix, c) in s.char_indices() {
+        match c {
+            '<' => in_tag = true,
+            '>' => in_tag = false,
+            ' ' | '-' if !in_tag => {
+                words.push(&s[start..ix]);
+                separators.push(c);
+                start = ix + 1;
+            }
+            _ => {}
+        }
+    }
+    words.push(&s[start..]);
+    let tags_len = |w: &str, from_start: bool| {
+        let mut rest = w;
+        loop {
+            let next = if from_start {
+                rest.strip_prefix('<')
+                    .and_then(|r| r.find('>').map(|e| &r[e + 1..]))
+            } else {
+                rest.strip_suffix('>')
+                    .and_then(|r| r.rfind('<').map(|b| &r[..b]))
+            };
+            match next {
+                Some(n) => rest = n,
+                None => return w.len() - rest.len(),
+            }
+        }
+    };
+    let words = words
+        .into_iter()
+        .map(|w| {
+            let open = tags_len(w, true);
+            let close = tags_len(&w[open..], false);
+            MarkedUpWord {
+                open: &w[..open],
+                text: &w[open..w.len() - close],
+                close: &w[w.len() - close..],
+            }
+        })
+        .collect();
+    (words, separators)
+}
+
+/// Initializes the text of a given name containing markup and puts each word's tags back
+/// around the matching initial. `None` if the words do not line up afterwards.
+fn initialize_marked_up(
+    given_name: &str,
+    initialize: bool,
+    with: Option<&str>,
+    initialize_with_hyphens: bool,
+) -> Option<String> {
+    let (words, separators) = marked_up_words(given_name);
+    let mut plain = String::new();
+    for (ix, word) in words.iter().enumerate() {
+        plain.push_str(word.text);
+        if let Some(sep) = separators.get(ix) {
+            plain.push(*sep);
+        }
+    }
+    let done = initialize_plain(&plain, initialize, with, initialize_with_hyphens);
+    let mut out_words = done
+        .split(|c| c == ' ' || c == '-')
+        .filter(|w| !w.is_empty());
+    let mut out = String::with_capacity(given_name.len());
+    let mut rest = done.as_ref();
+    for word in &words {
+        let out_word = out_words.next()?;
+        let at = rest.find(out_word)?;
+        out.push_str(&rest[..at]);
+        out.push_str(word.open);
+        out.push_str(out_word);
+        out.push_str(word.close);
+        rest = &rest[at + out_word.len()..];
+    }
+    if out_words.next().is_some() {
+        return None;
+    }
+    out.push_str(rest);
+    Some(out)
+}
+
+#[test]
+fn test_initialize_marked_up() {
+    let go = |s| initialize(s, true, Some(". "), true).into_owned();
+    assert_eq!(go("<b>John</b> Quiggly"), "<b>J.</b> Q.");
+    assert_eq!(go("<b>John</b>-Quiggly"), "<b>J.</b>-Q.");
+    assert_eq!(go("<b>J</b> Q"), "<b>J.</b> Q.");
+    assert_eq!(go("J-Q"), "J.-Q.");
+    assert_eq!(go("<b>J</b>-Q"), "<b>J.</b>-Q.");
+    assert_eq!(
+        go("<span class=\"nocase\">John</span> Q"),
+        "<span class=\"nocase\">J.</span> Q."
+    );
+}
+
+fn initialize_plain<'n>(
+    given_name: &'n str,
+    initialize: bool,
+    with: Option<&str>,
+    initialize_with_hyphens: bool,
+) -> Cow<'n, str> {
     if let Some(with) = with {
         #[derive(Copy, Clone, PartialEq)]
         enum State {
@@ -156,7 +283,7 @@ fn uppercase_char(inp: &str) -> IResult<&str, &str> {
 // "Ph."  => ["Ph"]
 fn without_dot(inp: &str) -> IResult<&str, &str> {
     alt((
-        recognize(tuple((uppercase_char, take_while(|c: char| c != '.')))),
+        recognize(tuple((uppercase_char, take_while(normal)))),
         uppercase_char,
     ))(inp)
 }

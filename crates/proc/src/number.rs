@@ -2,8 +2,9 @@ use crate::prelude::*;
 use citeproc_io::NumericToken::{self, *};
 use citeproc_io::{roman, NumericValue};
 use csl::{
-    Gender, Locale, MiscTerm, NumberVariable, OrdinalTerm, OrdinalTermSelector, PageRangeFormat,
-    SimpleTermSelector, TermFormExtended,
+    Gender, GenderedTermSelector, Locale, MiscTerm, NumberVariable, OrdinalTerm,
+    OrdinalTermSelector, PageRangeFormat, SimpleTermSelector, TermForm, TermFormExtended,
+    TextTermSelector,
 };
 use std::fmt::Write;
 
@@ -16,8 +17,16 @@ pub fn render_ordinal(
     long: bool,
 ) -> SmartString {
     let mut s = SmartString::new();
-    for token in ts {
+    // Numbers after a label like "p." belong to that label, so they are not ordinals
+    let mut after_label = false;
+    for (ix, token) in ts.iter().enumerate() {
         match *token {
+            Num(n) | Roman(n, _) if after_label => write!(s, "{}", n).unwrap(),
+            Hyphen if after_label => s.push_str(get_hyphen(locale, NumberVariable::Page)),
+            Label(ref label) => {
+                s.push_str(&render_label(label, ts[ix + 1..].iter(), locale));
+                after_label = true;
+            }
             Num(n) | Roman(n, _) => {
                 if !long || n == 0 || n > 10 {
                     write!(s, "{}", n).unwrap();
@@ -51,6 +60,26 @@ pub fn render_ordinal(
             }
         }
     }
+    s
+}
+
+/// The locale's own form of a label found inside a number, plural if more than one number follows
+/// it before the next label.
+fn render_label<'a>(
+    label: &str,
+    mut rest: impl Iterator<Item = &'a NumericToken>,
+    locale: &Locale,
+) -> SmartString {
+    let plural = rest
+        .by_ref()
+        .take_while(|t| !matches!(t, Label(_)))
+        .any(|t| matches!(t, Hyphen | Comma | Ampersand | And | CommaAnd));
+    let term = locale.locator_for_label(label).and_then(|locator| {
+        let sel = GenderedTermSelector::Locator(locator, TermForm::Short);
+        locale.get_text_term(TextTermSelector::Gendered(sel), plural)
+    });
+    let mut s = SmartString::from(term.unwrap_or(label));
+    s.push(' ');
     s
 }
 
@@ -269,6 +298,13 @@ fn tokens_to_string(
                 s.push_str(&str);
                 State::Normal
             }
+            Label(ref label) => {
+                state
+                    .non_num_should_push_hyphen()
+                    .write(&mut s, locale, variable);
+                s.push_str(&render_label(label, iter.clone(), locale));
+                State::Normal
+            }
             Comma => {
                 state
                     .non_num_should_push_hyphen()
@@ -321,8 +357,9 @@ pub fn roman_lower(
     _prf: Option<PageRangeFormat>,
 ) -> SmartString {
     let mut s = SmartString::new();
-    for t in ts {
+    for (ix, t) in ts.iter().enumerate() {
         match t {
+            Label(ref label) => s.push_str(&render_label(label, ts[ix + 1..].iter(), locale)),
             Roman(i, _) | Num(i) => {
                 if let Some(x) = roman::to(*i) {
                     s.push_str(&x);

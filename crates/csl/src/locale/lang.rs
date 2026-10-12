@@ -104,6 +104,11 @@ impl Lang {
         }
     }
 
+    /// Turkish and Azerbaijani, which have dotted and dotless i.
+    pub fn is_turkic(&self) -> bool {
+        matches!(self, Lang::Iso(IsoLang::Other(code), _) if code == "tr" || code == "az")
+    }
+
     /// Useful for title-casing.
     pub fn is_english(&self) -> bool {
         match self {

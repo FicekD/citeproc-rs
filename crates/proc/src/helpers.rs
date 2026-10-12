@@ -373,36 +373,6 @@ pub(crate) mod slice_group_by {
     /// The predicate is called on two elements following themselves,
     /// it means the predicate is called on `slice[0]` and `slice[1]`
     /// then on `slice[1]` and `slice[2]` and so on.
-    ///
-    /// # Examples
-    ///
-    /// ```ignore
-    /// #![feature(slice_group_by)]
-    ///
-    /// let slice = &[1, 1, 1, 3, 3, 2, 2, 2];
-    ///
-    /// let mut iter = slice.group_by(|a, b| a == b);
-    ///
-    /// assert_eq!(iter.next(), Some(&[1, 1, 1][..]));
-    /// assert_eq!(iter.next(), Some(&[3, 3][..]));
-    /// assert_eq!(iter.next(), Some(&[2, 2, 2][..]));
-    /// assert_eq!(iter.next(), None);
-    /// ```
-    ///
-    /// This method can be used to extract the sorted subslices:
-    ///
-    /// ```ignore
-    /// #![feature(slice_group_by)]
-    ///
-    /// let slice = &[1, 1, 2, 3, 2, 3, 2, 3, 4];
-    ///
-    /// let mut iter = slice.group_by(|a, b| a <= b);
-    ///
-    /// assert_eq!(iter.next(), Some(&[1, 1, 2, 3][..]));
-    /// assert_eq!(iter.next(), Some(&[2, 3][..]));
-    /// assert_eq!(iter.next(), Some(&[2, 3, 4][..]));
-    /// assert_eq!(iter.next(), None);
-    /// ```
     // #[unstable(feature = "slice_group_by", issue = "80552")]
     #[inline]
     pub fn group_by<T, F>(slice: &[T], pred: F) -> GroupBy<'_, T, F>
@@ -418,36 +388,6 @@ pub(crate) mod slice_group_by {
     /// The predicate is called on two elements following themselves,
     /// it means the predicate is called on `slice[0]` and `slice[1]`
     /// then on `slice[1]` and `slice[2]` and so on.
-    ///
-    /// # Examples
-    ///
-    /// ```ignore
-    /// #![feature(slice_group_by)]
-    ///
-    /// let slice = &mut [1, 1, 1, 3, 3, 2, 2, 2];
-    ///
-    /// let mut iter = slice.group_by_mut(|a, b| a == b);
-    ///
-    /// assert_eq!(iter.next(), Some(&mut [1, 1, 1][..]));
-    /// assert_eq!(iter.next(), Some(&mut [3, 3][..]));
-    /// assert_eq!(iter.next(), Some(&mut [2, 2, 2][..]));
-    /// assert_eq!(iter.next(), None);
-    /// ```
-    ///
-    /// This method can be used to extract the sorted subslices:
-    ///
-    /// ```ignore
-    /// #![feature(slice_group_by)]
-    ///
-    /// let slice = &mut [1, 1, 2, 3, 2, 3, 2, 3, 4];
-    ///
-    /// let mut iter = slice.group_by_mut(|a, b| a <= b);
-    ///
-    /// assert_eq!(iter.next(), Some(&mut [1, 1, 2, 3][..]));
-    /// assert_eq!(iter.next(), Some(&mut [2, 3][..]));
-    /// assert_eq!(iter.next(), Some(&mut [2, 3, 4][..]));
-    /// assert_eq!(iter.next(), None);
-    /// ```
     // #[unstable(feature = "slice_group_by", issue = "80552")]
     #[inline]
     pub fn group_by_mut<T, F>(slice: &mut [T], pred: F) -> GroupByMut<'_, T, F>
@@ -455,5 +395,50 @@ pub(crate) mod slice_group_by {
         F: FnMut(&T, &T) -> bool,
     {
         GroupByMut::new(slice, pred)
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::{group_by, group_by_mut};
+
+        #[test]
+        fn groups_equal_runs() {
+            let slice = &[1, 1, 1, 3, 3, 2, 2, 2];
+            let mut iter = group_by(slice, |a, b| a == b);
+            assert_eq!(iter.next(), Some(&[1, 1, 1][..]));
+            assert_eq!(iter.next(), Some(&[3, 3][..]));
+            assert_eq!(iter.next(), Some(&[2, 2, 2][..]));
+            assert_eq!(iter.next(), None);
+        }
+
+        #[test]
+        fn groups_sorted_runs() {
+            let slice = &[1, 1, 2, 3, 2, 3, 2, 3, 4];
+            let mut iter = group_by(slice, |a, b| a <= b);
+            assert_eq!(iter.next(), Some(&[1, 1, 2, 3][..]));
+            assert_eq!(iter.next(), Some(&[2, 3][..]));
+            assert_eq!(iter.next(), Some(&[2, 3, 4][..]));
+            assert_eq!(iter.next(), None);
+        }
+
+        #[test]
+        fn groups_equal_runs_mut() {
+            let slice = &mut [1, 1, 1, 3, 3, 2, 2, 2];
+            let mut iter = group_by_mut(slice, |a, b| a == b);
+            assert_eq!(iter.next(), Some(&mut [1, 1, 1][..]));
+            assert_eq!(iter.next(), Some(&mut [3, 3][..]));
+            assert_eq!(iter.next(), Some(&mut [2, 2, 2][..]));
+            assert_eq!(iter.next(), None);
+        }
+
+        #[test]
+        fn groups_sorted_runs_mut() {
+            let slice = &mut [1, 1, 2, 3, 2, 3, 2, 3, 4];
+            let mut iter = group_by_mut(slice, |a, b| a <= b);
+            assert_eq!(iter.next(), Some(&mut [1, 1, 2, 3][..]));
+            assert_eq!(iter.next(), Some(&mut [2, 3][..]));
+            assert_eq!(iter.next(), Some(&mut [2, 3, 4][..]));
+            assert_eq!(iter.next(), None);
+        }
     }
 }

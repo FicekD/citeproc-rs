@@ -46,6 +46,8 @@ pub enum NumericToken {
     Ampersand,
     And,
     CommaAnd,
+    /// A locator label inside the value, as the "p." in "7, p. 3-8"
+    Label(String),
 }
 
 use self::NumericToken::*;
@@ -189,10 +191,10 @@ impl<'a> NumericValue<'a> {
 use nom::{
     branch::alt,
     bytes::complete::{escaped, is_not, tag},
-    character::complete::{char, digit1, one_of},
-    combinator::{map, map_parser, map_res, opt, rest},
-    multi::{fold_many1, many0, many0_count},
-    sequence::{delimited, tuple},
+    character::complete::{alpha1, char, digit1, one_of},
+    combinator::{map, map_parser, map_res, opt, recognize, rest},
+    multi::{fold_many1, many0, many0_count, many1_count},
+    sequence::{delimited, terminated, tuple},
     IResult,
 };
 
@@ -407,18 +409,30 @@ fn num_ish(inp: &str) -> IResult<&str, NumericToken> {
     alt((roman_numeral, num_alpha_num, int))(inp)
 }
 
+/// "p. " before a number
+fn label(inp: &str) -> IResult<&str, NumericToken> {
+    map(
+        terminated(
+            recognize(tuple((alpha1, char('.')))),
+            many1_count(char(' ')),
+        ),
+        |l: &str| Label(l.into()),
+    )(inp)
+}
+
 fn num_tokens<'a>(
     and_term: &'a str,
 ) -> impl Fn(&'a str) -> IResult<&'a str, Vec<NumericToken>> + 'a {
     move |inp| {
         map(
-            tuple((num_ish, many0(tuple((sep(and_term), num_ish))))),
+            tuple((num_ish, many0(tuple((sep(and_term), opt(label), num_ish))))),
             |(n, rest)| {
-                let mut new = Vec::with_capacity(rest.len() * 2);
+                let mut new = Vec::with_capacity(rest.len() * 3);
                 new.push(n);
-                rest.into_iter().fold(new, |mut acc, p| {
-                    acc.push(p.0);
-                    acc.push(p.1);
+                rest.into_iter().fold(new, |mut acc, (sep, label, num)| {
+                    acc.push(sep);
+                    acc.extend(label);
+                    acc.push(num);
                     acc
                 })
             },
@@ -443,6 +457,13 @@ fn test_num_token_parser() {
     assert_eq!(
         num_tokens("et")("2 - 5, 9, edition"),
         Ok((", edition", vec![nn(2), Hyphen, nn(5), Comma, nn(9),]))
+    );
+    assert_eq!(
+        num_tokens("et")("7, p. 3-8"),
+        Ok((
+            "",
+            vec![nn(7), Comma, Label("p.".into()), nn(3), Hyphen, nn(8)]
+        ))
     );
 }
 

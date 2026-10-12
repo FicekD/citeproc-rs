@@ -511,6 +511,10 @@ impl IngestOptions {
         entire_is_uppercase: bool,
     ) -> String {
         match self.text_case {
+            TextCase::Lowercase if self.is_turkic => {
+                s.replace('I', "ı").replace('İ', "i").to_lowercase().into()
+            }
+            TextCase::Uppercase if self.is_turkic => s.replace('i', "İ").to_uppercase().into(),
             TextCase::Lowercase => lazy::lazy_lowercase_owned(s),
             TextCase::Uppercase => lazy::lazy_uppercase_owned(s),
             TextCase::CapitalizeFirst => transform_first_word(s, transform_uppercase_first),

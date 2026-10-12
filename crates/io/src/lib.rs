@@ -25,6 +25,8 @@ mod cite;
 mod cluster;
 mod csl_json;
 mod date;
+mod edtf;
+mod note_fields;
 mod names;
 pub use names::TrimInPlace;
 mod numeric;
@@ -67,6 +69,8 @@ pub struct IngestOptions {
     pub quotes: LocalizedQuotes,
     pub strip_periods: bool,
     pub is_english: bool,
+    /// Turkish and Azerbaijani pair dotted and dotless i differently when changing case
+    pub is_turkic: bool,
 
     /// For `flipflop_LeadingMarkupWithApostrophe.txt`
     ///

@@ -577,6 +577,24 @@ pub(crate) fn collapse_cites<O: OutputFormat<Output = SmartString>>(
             }
         }
     }
+
+    // A grouped cite that rendered only the names we just suppressed, like one with no date
+    // under collapse="year", has nothing left to show. Drop it, and let the previous cite take
+    // over its delimiter.
+    if collapse != Collapse::CitationNumber {
+        let mut last_kept = 0;
+        for ix in 1..cites.len() {
+            let empty = cites[ix].by_name() == cites[last_kept].by_name()
+                && !cites[ix].has_locator_or_affixes
+                && cites[ix].gen4.tree_ref().renders_nothing();
+            if empty {
+                cites[ix].destination = WhichStream::Nowhere;
+                cites[last_kept].own_delimiter = cites[ix].own_delimiter;
+            } else {
+                last_kept = ix;
+            }
+        }
+    }
 }
 
 fn collapse_year_suffix_run<O: OutputFormat>(

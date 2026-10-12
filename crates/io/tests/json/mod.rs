@@ -485,10 +485,30 @@ fn test_date_combos() {
 }
 
 #[test]
-#[ignore = "EDTF dates not implemented yet"]
 fn test_edtf_date() {
     setup();
     let _edtf_schema = get_schema().named_schema(CslDataSchema::EDTF_DATATYPE);
-    let doc = json!({ "id": 1, "issued": "199X" });
-    let _refr: Reference = serde_json::from_value(doc).unwrap();
+    let issued = |doc| {
+        let refr: Reference = serde_json::from_value(doc).unwrap();
+        refr.date.get(&Issued).cloned()
+    };
+    assert_eq!(
+        issued(json!({ "id": 1, "issued": "1985-04-12/1985-06" })),
+        Some(DateOrRange::Range(
+            Date::new(1985, 4, 12),
+            Date::new(1985, 6, 0)
+        ))
+    );
+    assert_eq!(
+        issued(json!({ "id": 1, "issued": { "edtf": "2004-21" } })),
+        Some(DateOrRange::new(2004, 13, 0))
+    );
+    // A decade is valid EDTF but not a CSL date, so it is kept as written
+    assert_eq!(
+        issued(json!({ "id": 1, "issued": "199X" })),
+        Some(DateOrRange::Literal {
+            literal: "199X".into(),
+            circa: false
+        })
+    );
 }
