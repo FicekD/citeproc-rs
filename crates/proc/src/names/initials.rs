@@ -234,6 +234,13 @@ fn initialize_plain<'n>(
                         State::AfterName
                     }
                 }
+                // "P.J., Coleman" keeps its comma against the initials
+                Other(ref n) if n.starts_with(|c| c == ',' || c == ';') => {
+                    build.truncate(build.trim_end().len());
+                    build.push_str(n);
+                    build.push(' ');
+                    state
+                }
                 Other(ref n) => {
                     if state != State::Start {
                         // Exactly one space please

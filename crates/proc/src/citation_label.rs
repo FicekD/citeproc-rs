@@ -50,6 +50,7 @@ impl Trigraph {
                             continue;
                         }
                     };
+                    let name_to_write = without_leading_article(name_to_write);
                     let len = Graphemes::new(name_to_write)
                         .take(author_printer as usize)
                         .fold(0, |acc, x| acc + x.len());
@@ -71,6 +72,23 @@ impl Trigraph {
         }
         string
     }
+}
+
+/// Like citeproc-js, labels "The ATLAS Collaboration" by "ATLAS" and "de la Cruz" by "Cruz".
+fn without_leading_article(name: &str) -> &str {
+    let mut rest = name;
+    while let Some((word, after)) = rest.split_once(' ') {
+        let particle = word
+            .chars()
+            .all(|c| c.is_lowercase() || c == '\'' || c == '\u{2019}');
+        let article = ["a", "an", "the"].contains(&word.to_lowercase().as_str());
+        if (particle || article) && !after.trim().is_empty() {
+            rest = after.trim_start();
+        } else {
+            break;
+        }
+    }
+    rest
 }
 
 impl Default for Trigraph {

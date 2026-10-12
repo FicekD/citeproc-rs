@@ -58,6 +58,8 @@ pub struct TestCase {
     pub result: String,
     pub clusters: Option<Vec<Cluster>>,
     pub process_citation_clusters: Option<Vec<CiteprocJsInstruction>>,
+    /// Note numbers given for the clusters, as citeproc-js's "note-number" on a cite
+    pub note_numbers: Vec<Option<u32>>,
     pub processor: Processor,
 }
 
@@ -89,6 +91,7 @@ impl Clone for TestCase {
             result: self.result.clone(),
             clusters: self.clusters.clone(),
             process_citation_clusters: self.process_citation_clusters.clone(),
+            note_numbers: self.note_numbers.clone(),
         }
     }
 }
@@ -137,6 +140,7 @@ impl TestCase {
             result,
             clusters,
             process_citation_clusters,
+            note_numbers: Vec::new(),
             processor,
         })
     }
@@ -184,7 +188,13 @@ impl TestCase {
                 .enumerate()
                 .map(|(ix, cluster)| ClusterPosition {
                     id: Some(cluster.id),
-                    note: Some(ix as u32 + 1),
+                    note: Some(
+                        self.note_numbers
+                            .get(ix)
+                            .copied()
+                            .flatten()
+                            .unwrap_or(ix as u32 + 1),
+                    ),
                 })
                 .collect();
 

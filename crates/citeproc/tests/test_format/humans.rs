@@ -402,7 +402,23 @@ pub fn parse_human_test(
     };
     let result = super::normalise_html(section("RESULT")?, &options);
 
-    TestCase::new(
+    let note_numbers = sections
+        .get("CITATION-ITEMS")
+        .and_then(|s| serde_json::from_str::<Vec<Vec<serde_json::Value>>>(s).ok())
+        .map(|clusters| {
+            clusters
+                .iter()
+                .map(|cites| {
+                    let note = cites.first()?.get("note-number")?;
+                    note.as_u64()
+                        .map(|n| n as u32)
+                        .or_else(|| note.as_str()?.parse().ok())
+                })
+                .collect()
+        })
+        .unwrap_or_default();
+
+    let mut test_case = TestCase::new(
         mode,
         options,
         section("CSL")?.clone(),
@@ -421,5 +437,7 @@ pub fn parse_human_test(
                 .map(CiteprocJsInstruction::from)
                 .collect()
         }),
-    )
+    )?;
+    test_case.note_numbers = note_numbers;
+    Ok(test_case)
 }

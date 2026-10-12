@@ -206,6 +206,20 @@ impl From<PersonNameInput> for PersonName {
             static_particles,
             comma_suffix,
         } = input;
+        // Supplying any of these, even empty, means the name is already split up
+        let supplied = static_particles
+            || non_dropping_particle.is_some()
+            || dropping_particle.is_some()
+            || suffix.is_some();
+        // but an empty part, like "suffix": "", renders like a missing one
+        let present = |part: Option<String>| part.filter(|p| !p.trim().is_empty());
+        let (family, given, non_dropping_particle, dropping_particle, suffix) = (
+            present(family),
+            present(given),
+            present(non_dropping_particle),
+            present(dropping_particle),
+            present(suffix),
+        );
 
         let mut pn = PersonName {
             family,
@@ -224,17 +238,13 @@ impl From<PersonNameInput> for PersonName {
             non_dropping_particle,
             dropping_particle,
             suffix,
-            static_particles,
+            static_particles: _,
             comma_suffix,
             is_latin_cyrillic: _,
         } = &mut pn;
 
         // Don't parse if these are supplied
-        if *static_particles
-            || non_dropping_particle.is_some()
-            || dropping_particle.is_some()
-            || suffix.is_some()
-        {
+        if supplied {
             family.as_mut().map(replace_apostrophes_mut);
             given.as_mut().map(replace_apostrophes_mut);
             non_dropping_particle.as_mut().map(replace_apostrophes_mut);

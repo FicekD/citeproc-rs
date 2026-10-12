@@ -504,7 +504,10 @@ impl<'a, O: OutputFormat> StyleWalker for SortingWalker<'a, O> {
         let out = output.unwrap_or_default();
         let is_empty = out.is_empty();
         match fold_type {
-            WalkerFoldType::Group(_g) => gv_acc.implicit_conditional(out, is_empty),
+            // A macro call behaves like a group, as it does when rendering
+            WalkerFoldType::Group(_) | WalkerFoldType::Macro(_) => {
+                gv_acc.implicit_conditional(out, is_empty)
+            }
             _ => (out, gv_acc),
         }
     }

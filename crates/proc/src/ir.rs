@@ -93,6 +93,8 @@ pub struct IrSeq {
     pub display: Option<DisplayMode>,
     pub quotes: Option<LocalizedQuotes>,
     pub text_case: TextCase,
+    /// From strip-periods on a `<text macro>`
+    pub strip_periods: bool,
     /// GroupVars of the dropped nodes in an implicit conditional group.
     ///
     /// If this is Some, it contains the neighbour()-sum of the groupvars of any child nodes that
@@ -120,7 +122,7 @@ impl fmt::Debug for IrSeq {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let Self {
             formatting, affixes, delimiter, display, quotes,
-            text_case, dropped_gv, should_inherit_delim, is_layout,
+            text_case, strip_periods, dropped_gv, should_inherit_delim, is_layout,
         } = self;
         let mut f = f.debug_struct("IrSeq");
         if formatting.is_some() { f.field("formatting", &formatting); }
@@ -129,6 +131,7 @@ impl fmt::Debug for IrSeq {
         if display.is_some() { f.field("display", &display); }
         if quotes.is_some() { f.field("quotes", &quotes); }
         if *text_case != TextCase::None { f.field("text_case", &text_case); }
+        if *strip_periods { f.field("strip_periods", &strip_periods); }
         if dropped_gv.is_some() { f.field("dropped_gv", &dropped_gv); }
         if *should_inherit_delim { f.field("should_inherit_delim", &should_inherit_delim); }
         if *is_layout { f.field("is_layout", &is_layout); }
@@ -521,6 +524,7 @@ impl IrSeq {
             ref quotes,
             display,
             text_case,
+            strip_periods,
             dropped_gv: _,
             should_inherit_delim,
             is_layout: _,
@@ -544,6 +548,7 @@ impl IrSeq {
             &mut grp,
             &IngestOptions {
                 text_case,
+                strip_periods,
                 ..Default::default()
             },
         );
@@ -573,6 +578,7 @@ impl IrSeq {
             // TODO: use these
             quotes: _,
             text_case: _,
+            strip_periods: _,
             dropped_gv: _,
             should_inherit_delim,
             is_layout: _,

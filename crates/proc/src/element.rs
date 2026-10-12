@@ -126,6 +126,7 @@ where
                                 display: text.display,
                                 quotes: renderer.quotes_if(text.quotes),
                                 text_case: text.text_case,
+                                strip_periods: text.strip_periods,
                                 should_inherit_delim: false,
                                 ..Default::default()
                             }),

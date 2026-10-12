@@ -701,6 +701,17 @@ impl<'a, O: OutputFormat> OneNameVar<'a, O> {
     }
 
     #[inline]
+    /// Subsequent cites can enable et-al with only the et-al-subsequent-* attributes.
+    fn et_al_enabled(&self, pos: Position) -> bool {
+        let el = self.name_el;
+        if pos == Position::First {
+            el.enable_et_al()
+        } else {
+            el.et_al_subsequent_min.or(el.et_al_min).is_some()
+                && el.et_al_subsequent_use_first.or(el.et_al_use_first).is_some()
+        }
+    }
+
     fn ea_min(&self, pos: Position) -> usize {
         let first = self.name_el.et_al_min.unwrap_or(0);
         let min = if pos == Position::First {
@@ -733,7 +744,7 @@ impl<'a, O: OutputFormat> OneNameVar<'a, O> {
     ) -> Vec<NameToken> {
         let ea_min = self.ea_min(position);
         let ea_use_first = self.ea_use_first(position);
-        if self.name_el.enable_et_al() && name_count >= ea_min {
+        if self.et_al_enabled(position) && name_count >= ea_min {
             // etal_UseZeroFirst
             if ea_use_first == 0 {
                 return Vec::new();

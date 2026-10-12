@@ -51,8 +51,8 @@ number_RevNumberPagelabelSingleRoman.txt
 number_Substring.txt
 sort_NumericVariables.txt
 
-# Variables, names, dates and types carried in the note field (Zotero's
-# "extra" convention). citeproc-rs leaves that to the caller.
+# Note-field variants beyond the basic convention: dates that override the
+# item's own, inline names without a separate line, and unrecognised types.
 dateparser_CheaterSyntax.txt
 magic_TypeFieldHack.txt
 name_CheaterNames.txt
@@ -91,13 +91,6 @@ name_ImplicitInstitution.txt
 name_NbspJoinFR.txt
 name_ZwnbspJoinEN.txt
 name_ZwnbspJoinFR.txt
-
-# Relies on forcing "position" or "near-note" on a cite. In citeproc-rs cite
-# positions are always computed.
-nameattr_EtAlSubsequentMinOnCitationInCitation.txt
-nameattr_EtAlSubsequentMinOnStyleInCitation.txt
-nameattr_EtAlSubsequentUseFirstOnCitationInCitation.txt
-nameattr_EtAlSubsequentUseFirstOnStyleInCitation.txt
 
 # citeproc-js's discretionary author-only and ibid handling, which citeproc-rs
 # does differently through its cluster modes and <intext>.
@@ -140,12 +133,14 @@ sort_CitationUnsorted.txt
 flipflop_ItalicsSimplePlus.txt
 bugreports_NonBreakingSpaceJoinFail.txt
 
-# Not investigated yet.
-bugreports_lotOfAuthors.txt
-bugreports_mendeleyNameCrash.txt
-decor_BreakingQuotes.txt
-disambiguate_BasedOnSubsequentFormWithLocator.txt
-disambiguate_PreferSingleName.txt
+# Deliberate differences where citeproc-rs follows the CSL specification:
+# strip-periods removes every period (citeproc-js keeps those before a
+# lowercase letter), and disambiguation adds names before expanding given names.
 magic_StripPeriodsOnDottedTitle.txt
+disambiguate_PreferSingleName.txt
+
+# citeproc-js reads "et al." typed into a given name as an et-al marker.
 name_EtAlAsSuffixInCitationShort.txt
-sort_WithMacro.txt
+
+# Pairing a stray apostrophe with the double quotes after it.
+decor_BreakingQuotes.txt

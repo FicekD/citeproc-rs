@@ -510,6 +510,11 @@ impl IngestOptions {
         is_last: bool,
         entire_is_uppercase: bool,
     ) -> String {
+        let s = if self.strip_periods {
+            lazy::lazy_replace_char_owned(s, '.', "")
+        } else {
+            s
+        };
         match self.text_case {
             TextCase::Lowercase if self.is_turkic => {
                 s.replace('I', "ı").replace('İ', "i").to_lowercase().into()

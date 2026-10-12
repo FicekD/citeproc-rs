@@ -273,7 +273,7 @@ impl OutputFormat for Markup {
 
     #[inline]
     fn apply_text_case(&self, build: &mut Self::Build, options: &IngestOptions) {
-        if options.text_case == TextCase::None {
+        if options.text_case == TextCase::None && !options.strip_periods {
             return;
         }
         let is_uppercase = options.is_uppercase(build);
