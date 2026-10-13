@@ -23,7 +23,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: true
+      - name: Check out the citeproc-js fixtures
+        run: git submodule update --init --checkout --depth 1 crates/citeproc/tests/data/citeproc-js
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
       - name: Pull locales

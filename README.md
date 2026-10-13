@@ -29,7 +29,7 @@ Not ported (excluded from the default build):
 
 ```sh
 # one-time setup for the test suite
-git submodule update --init           # the CSL test-suite and citeproc-js fixtures
+git submodule update --init --checkout   # the CSL test-suite and citeproc-js fixtures
 cargo pull-locales                    # clones the CSL locales into the OS cache dir
 
 # build the native library + FFI crates
@@ -44,7 +44,7 @@ cargo test
 `crates/citeproc/tests/suite.rs` runs about 1,600 fixtures through a [`libtest-mimic`] harness, in roughly 12 seconds:
 
 * the official [CSL test-suite] (`tests/data/test-suite`, a submodule tracking upstream), which is processor independent and is the closest thing CSL has to a conformance suite;
-* citeproc-js's own fixtures (`tests/data/citeproc-js`, a shallow submodule). Together with the CSL test-suite these make up the 1,500 or so tests citeproc-js reports;
+* citeproc-js's own fixtures (`tests/data/citeproc-js`, a shallow submodule). It is marked `update = none` so that Cargo skips it when the crate is used as a git dependency, since citeproc-js's own submodules use SSH URLs that Cargo cannot fetch; `--checkout` above overrides that. Together with the CSL test-suite these make up the 1,500 or so tests citeproc-js reports;
 * citeproc-rs's own YAML fixtures in `tests/data/humans`, including citations and bibliographies for eight real styles whose expected output came from citeproc-js, and the text fixtures in `tests/data/fixtures-local`.
 
 Fixtures that need something citeproc-rs does not implement (CSL-M styles, abbreviation lists, multilingual settings, citeproc-js engine options, bibliography sections) are detected from their content and reported as ignored. Known failures are listed with reasons in `tests/data/expected-failures/` and are also reported as ignored. Fixtures where citeproc-rs deliberately differs from citeproc-js, mostly where it follows the specification more closely, are listed in `tests/data/snapshot.txt` and compared against insta snapshots of citeproc-rs's own output, so they still catch regressions.

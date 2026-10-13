@@ -5,3 +5,4 @@
 	path = crates/citeproc/tests/data/citeproc-js
 	url = https://github.com/Juris-M/citeproc-js.git
 	shallow = true
+	update = none
